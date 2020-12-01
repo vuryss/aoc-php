@@ -6,12 +6,12 @@ namespace App;
 
 use App\Event\DayInterface;
 use App\Event\EventDayRegistry;
+use Exception;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Throwable;
 
 class SolveCommand extends Command
 {
@@ -54,7 +54,7 @@ class SolveCommand extends Command
      * @param OutputInterface $output
      *
      * @return int
-     * @throws Throwable
+     * @throws Exception
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
@@ -102,6 +102,11 @@ class SolveCommand extends Command
         return Command::SUCCESS;
     }
 
+    /**
+     * @param DayInterface $eventDay
+     *
+     * @throws Exception
+     */
     private function runTestsForDay(DayInterface $eventDay)
     {
         $formatter = $this->getHelper('formatter');
