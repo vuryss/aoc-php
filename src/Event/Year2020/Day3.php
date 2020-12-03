@@ -49,7 +49,7 @@ class Day3 extends Day
     {
         $map = $this->generateMap($input);
 
-        return (string) $this->countTreeForSlope(3, 1, $map);
+        return (string) $this->countTreesForSlope(3, 1, $map);
     }
 
     public function solvePart2(string $input): string
@@ -57,11 +57,11 @@ class Day3 extends Day
         $map = $this->generateMap($input);
 
         return (string) array_product([
-            $this->countTreeForSlope(1, 1, $map),
-            $this->countTreeForSlope(3, 1, $map),
-            $this->countTreeForSlope(5, 1, $map),
-            $this->countTreeForSlope(7, 1, $map),
-            $this->countTreeForSlope(1, 2, $map),
+            $this->countTreesForSlope(1, 1, $map),
+            $this->countTreesForSlope(3, 1, $map),
+            $this->countTreesForSlope(5, 1, $map),
+            $this->countTreesForSlope(7, 1, $map),
+            $this->countTreesForSlope(1, 2, $map),
         ]);
     }
 
@@ -78,7 +78,7 @@ class Day3 extends Day
         return $map;
     }
 
-    private function countTreeForSlope(int $x, int $y, array $map): int
+    private function countTreesForSlope(int $x, int $y, array $map): int
     {
         $trees = 0;
         $height = count($map);
