@@ -82,20 +82,12 @@ class Day4 extends Day
 
     public function solvePart1(string $input): string
     {
-        $passports = explode("\n\n", $input);
+        $passports = $this->parsePassportsFromInput($input);
         $valid = 0;
 
         foreach ($passports as $passport) {
-            $fields = preg_split('/[\s\n]+/', $passport);
-            $data = [];
-
-            foreach ($fields as $field) {
-                [$field, $value] = explode(':', $field);
-                $data[$field] = $value;
-            }
-
             foreach (self::VALIDATIONS as $key => $validations) {
-                if (!isset($data[$key])) {
+                if (!isset($passport[$key])) {
                     continue 2;
                 }
             }
@@ -108,20 +100,12 @@ class Day4 extends Day
 
     public function solvePart2(string $input): string
     {
-        $passports = explode("\n\n", $input);
+        $passports = $this->parsePassportsFromInput($input);
         $valid = 0;
 
         foreach ($passports as $passport) {
-            $fields = preg_split('/[\s\n]+/', $passport);
-            $data = [];
-
-            foreach ($fields as $field) {
-                [$field, $value] = explode(':', $field);
-                $data[$field] = $value;
-            }
-
             foreach (self::VALIDATIONS as $key => $validations) {
-                if (!isset($data[$key]) || !$this->isValueValid($data[$key], $validations)) {
+                if (!isset($passport[$key]) || !$this->isValueValid($passport[$key], $validations)) {
                     continue 2;
                 }
             }
@@ -130,6 +114,26 @@ class Day4 extends Day
         }
 
         return (string) $valid;
+    }
+
+    private function parsePassportsFromInput(string $input): array
+    {
+        $passportsData = explode("\n\n", $input);
+        $passports = [];
+
+        foreach ($passportsData as $passportsDatum) {
+            $fields = preg_split('/[\s\n]+/', $passportsDatum);
+            $data = [];
+
+            foreach ($fields as $field) {
+                [$field, $value] = explode(':', $field);
+                $data[$field] = $value;
+            }
+
+            $passports[] = $data;
+        }
+
+        return $passports;
     }
 
     private function isValueValid(string $value, array $validations): bool
