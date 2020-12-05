@@ -11,19 +11,14 @@ class Day4 extends Day
     const YEAR = 2020;
     const DAY = 4;
 
-    const VALIDATIONS = [
-        'byr' => ['regex' => '/^(\d{4})$/', 'min' => 1920, 'max' => 2002],
-        'iyr' => ['regex' => '/^(\d{4})$/', 'min' => 2010, 'max' => 2020],
-        'eyr' => ['regex' => '/^(\d{4})$/', 'min' => 2020, 'max' => 2030],
-        'hgt' => [
-            'or' => [
-                ['regex' => '/^(\d{2})in$/', 'min' => 59, 'max' => 76],
-                ['regex' => '/^(\d{3})cm$/', 'min' => 150, 'max' => 193],
-            ],
-        ],
-        'hcl' => ['regex' => '/^#[0-9abcdef]{6}$/'],
-        'ecl' => ['regex' => '/^amb|blu|brn|gry|grn|hzl|oth$/'],
-        'pid' => ['regex' => '/^\d{9}$/'],
+    const REGEX = [
+        'byr' => '/^(19[2-9][0-9])|(200[0-2])$/', // 1920 to 2002
+        'iyr' => '/^20(1\d|20)$/', // 2010 to 2020
+        'eyr' => '/^20(2\d|30)$/', // 2020 to 2030
+        'hgt' => '/^((59|6\d|7[0-6])in)|(((1[5-8]\d)|(19[0-3]))cm)$/', // 59in to 79in or 150cm to 193cm
+        'hcl' => '/^#[0-9abcdef]{6}$/',
+        'ecl' => '/^amb|blu|brn|gry|grn|hzl|oth$/',
+        'pid' => '/^\d{9}$/',
     ];
 
     public function testPart1(): iterable
@@ -86,7 +81,7 @@ class Day4 extends Day
         $valid = 0;
 
         foreach ($passports as $passport) {
-            foreach (self::VALIDATIONS as $key => $validations) {
+            foreach (self::REGEX as $key => $validations) {
                 if (!isset($passport[$key])) {
                     continue 2;
                 }
@@ -104,8 +99,8 @@ class Day4 extends Day
         $valid = 0;
 
         foreach ($passports as $passport) {
-            foreach (self::VALIDATIONS as $key => $validations) {
-                if (!isset($passport[$key]) || !$this->isValueValid($passport[$key], $validations)) {
+            foreach (self::REGEX as $key => $regex) {
+                if (!isset($passport[$key]) || preg_match($regex, $passport[$key]) !== 1) {
                     continue 2;
                 }
             }
@@ -134,29 +129,5 @@ class Day4 extends Day
         }
 
         return $passports;
-    }
-
-    private function isValueValid(string $value, array $validations): bool
-    {
-        if (isset($validations['or'])) {
-            $success = false;
-
-            foreach ($validations['or'] as $subValidations) {
-                $success = $success || $this->isValueValid($value, $subValidations);
-            }
-
-            return $success;
-        }
-
-        if (preg_match($validations['regex'], $value, $matches) !== 1) {
-            return false;
-        }
-
-        $number = (int) ($matches[1] ?? 0);
-
-        return !(
-            isset($validations['min']) && $number < $validations['min']
-            || isset($validations['max']) && $number > $validations['max']
-        );
     }
 }
