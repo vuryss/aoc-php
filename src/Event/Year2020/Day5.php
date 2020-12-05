@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Event\Year2020;
 
 use App\Event\Day;
-use Exception;
 
 class Day5 extends Day
 {
