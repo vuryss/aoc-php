@@ -27,13 +27,12 @@ class Day5 extends Day
 
     public function solvePart1(string $input): string
     {
-        return base_convert(max(explode("\n", strtr($input, 'FBLR', '0101'))), 2, 10);
+        return (string) bindec(max(explode("\n", strtr($input, 'FBLR', '0101'))));
     }
 
     public function solvePart2(string $input): string
     {
-        $lines = explode("\n", strtr($input, 'FBLR', '0101'));
-        $lines = array_map(fn ($a) => (int) base_convert($a, 2, 10), $lines);
-        return (string) current(array_filter(range(min($lines), max($lines)), fn ($a) => !in_array($a, $lines)));
+        $lines = array_map('bindec', explode("\n", strtr($input, 'FBLR', '0101')));
+        return (string) current(array_diff(range(min($lines), max($lines)), $lines));
     }
 }
