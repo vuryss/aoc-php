@@ -4,6 +4,12 @@
 
 - [2020](https://adventofcode.com/2020)
 
+## Requirements
+
+- PHP 7.4
+- Composer
+- Advent of Code account
+
 ## Installation
 
 Just clone the repo and run `composer install`
