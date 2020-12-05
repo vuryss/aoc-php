@@ -27,22 +27,13 @@ class Day5 extends Day
 
     public function solvePart1(string $input): string
     {
-        $lines = explode("\n", strtr($input, 'FBLR', '0101'));
-        rsort($lines);
-        return base_convert($lines[0], 2, 10);
+        return base_convert(max(explode("\n", strtr($input, 'FBLR', '0101'))), 2, 10);
     }
 
     public function solvePart2(string $input): string
     {
         $lines = explode("\n", strtr($input, 'FBLR', '0101'));
         $lines = array_map(fn ($a) => (int) base_convert($a, 2, 10), $lines);
-
-        for ($num = min($lines), $max = max($lines), $lines = array_flip($lines); $num < $max; $num++) {
-            if (!isset($lines[$num])) {
-                return (string) $num;
-            }
-        }
-
-        throw new Exception('Result not found');
+        return (string) current(array_filter(range(min($lines), max($lines)), fn ($a) => !in_array($a, $lines)));
     }
 }
