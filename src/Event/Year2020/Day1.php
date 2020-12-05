@@ -4,14 +4,11 @@ declare(strict_types=1);
 
 namespace App\Event\Year2020;
 
-use App\Event\Day;
+use App\Event\DayInterface;
 use Exception;
 
-class Day1 extends Day
+class Day1 implements DayInterface
 {
-    const YEAR = 2020;
-    const DAY = 1;
-
     public function testPart1(): iterable
     {
         yield '514579' => <<<'INPUT'

@@ -13,9 +13,9 @@ class EventDayRegistry
         $this->daysByYear = [];
     }
 
-    public function addDay(DayInterface $day): self
+    public function addDay(int $year, int $day, DayInterface $dayObject): self
     {
-        $this->daysByYear[$day->getYear()][$day->getDay()] = $day;
+        $this->daysByYear[$year][$day] = $dayObject;
 
         return $this;
     }

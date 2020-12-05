@@ -21,7 +21,8 @@ class EventDayCompilerPass implements CompilerPassInterface
         $taggedDays = $container->findTaggedServiceIds('app.event_day');
 
         foreach ($taggedDays as $id => $tags) {
-            $registry->addMethodCall('addDay', [new Reference($id)]);
+            preg_match('/Year(\d+)\\\\Day(\d+)/', $id, $matches);
+            $registry->addMethodCall('addDay', [(int) $matches[1], (int) $matches[2], new Reference($id)]);
         }
     }
 }

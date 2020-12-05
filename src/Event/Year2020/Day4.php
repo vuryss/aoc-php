@@ -4,13 +4,10 @@ declare(strict_types=1);
 
 namespace App\Event\Year2020;
 
-use App\Event\Day;
+use App\Event\DayInterface;
 
-class Day4 extends Day
+class Day4 implements DayInterface
 {
-    const YEAR = 2020;
-    const DAY = 4;
-
     const REGEX = [
         'byr' => '/^(19[2-9][0-9])|(200[0-2])$/', // 1920 to 2002
         'iyr' => '/^20(1\d|20)$/', // 2010 to 2020

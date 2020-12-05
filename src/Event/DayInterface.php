@@ -8,8 +8,6 @@ use Exception;
 
 interface DayInterface
 {
-    public function getDay(): int;
-    public function getYear(): int;
     public function testPart1(): iterable;
     public function testPart2(): iterable;
 
