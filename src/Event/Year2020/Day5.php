@@ -27,36 +27,19 @@ class Day5 extends Day
 
     public function solvePart1(string $input): string
     {
-        $lines = explode("\n", $input);
-        $max = PHP_INT_MIN;
-
-        foreach ($lines as $code) {
-            $code = strtr($code, 'FBLR', '0101');
-            $num = (int) base_convert($code, 2, 10);
-            $max = $num > $max ? $num : $max;
-        }
-
-        return (string) $max;
+        $lines = explode("\n", strtr($input, 'FBLR', '0101'));
+        rsort($lines);
+        return base_convert($lines[0], 2, 10);
     }
 
     public function solvePart2(string $input): string
     {
-        $lines = explode("\n", $input);
-        $max = PHP_INT_MIN;
-        $min = PHP_INT_MAX;
-        $map = [];
+        $lines = explode("\n", strtr($input, 'FBLR', '0101'));
+        $lines = array_map(fn ($a) => (int) base_convert($a, 2, 10), $lines);
 
-        foreach ($lines as $code) {
-            $code = strtr($code, 'FBLR', '0101');
-            $num = (int) base_convert($code, 2, 10);
-            $max = $num > $max ? $num : $max;
-            $min = $num < $min ? $num : $min;
-            $map[$num] = true;
-        }
-
-        for ($i = $min; $i < $max; $i++) {
-            if (!isset($map[$i])) {
-                return (string) $i;
+        for ($num = min($lines), $max = max($lines), $lines = array_flip($lines); $num < $max; $num++) {
+            if (!isset($lines[$num])) {
+                return (string) $num;
             }
         }
 
