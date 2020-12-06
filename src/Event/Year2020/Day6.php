@@ -57,9 +57,7 @@ class Day6 implements DayInterface
         $count = 0;
 
         foreach ($input as $group) {
-            $chars = count_chars($group, 1);
-            unset($chars[10]);
-            $count += count($chars);
+            $count += count(count_chars(strtr($group, ["\n" => '']), 1));
         }
 
         return (string) $count;
@@ -72,13 +70,8 @@ class Day6 implements DayInterface
 
         foreach ($input as $group) {
             $items = explode("\n", $group);
-            $answers = [];
-
-            foreach ($items as $item) {
-                $answers[] = count_chars($item, 1);
-            }
-
-            $count += count($answers) > 1 ? count(array_intersect_key(...$answers)) : count($answers[0]);
+            $answers = array_map(fn ($item) => count_chars($item, 1), $items);
+            $count += count(isset($answers[1]) ? array_intersect_key(...$answers) : $answers[0]);
         }
 
         return (string) $count;
