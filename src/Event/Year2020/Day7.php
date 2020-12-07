@@ -58,13 +58,7 @@ class Day7 implements DayInterface
 
         $unique = [];
         $queue = new SplQueue();
-
-        foreach ($bags as $bag) {
-            if (isset($bag->contains[self::OUR_BAG])) {
-                $unique[$bag->color] = true;
-                $queue->enqueue($bag);
-            }
-        }
+        $queue->enqueue($bags[self::OUR_BAG]);
 
         while ($queue->count() > 0) {
             $item = $queue->dequeue();
@@ -72,7 +66,7 @@ class Day7 implements DayInterface
             foreach ($bags as $bag) {
                 if (isset($bag->contains[$item->color])) {
                     $unique[$bag->color] = true;
-                    $queue[] = $bag;
+                    $queue->enqueue($bag);
                 }
             }
         }
