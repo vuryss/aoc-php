@@ -6,6 +6,7 @@ namespace App\Event\Year2020;
 
 use App\Event\DayInterface;
 use Exception;
+use SplQueue;
 
 class Day8 implements DayInterface
 {
@@ -113,28 +114,24 @@ class Day8 implements DayInterface
      */
     private function reverseEngineerIncorrectInstruction(array $instructions, array $visited): int
     {
-        $queue = [count($instructions)];
+        $queue = new SplQueue();
+        $queue->enqueue(count($instructions));
 
         do {
-            $max = $min = array_shift($queue);
+            $max = $min = $queue->dequeue();
 
             for ($i = $max - 1; $i >= 0; $i--) {
                 if ($instructions[$i][0] === 'jmp') {
-                    if ($instructions[$i][1] > 0 && $instructions[$i][1] + $i > $max) {
-                        if (isset($visited[$i])) {
-                            return $i;
-                        }
-                        break;
-                    }
-                    if ($instructions[$i][1] <= 0) {
-                        if (isset($visited[$i])) {
-                            return $i;
-                        }
+                    if ($instructions[$i][1] > 0 && $instructions[$i][1] + $i > $max || $instructions[$i][1] <= 0) {
                         break;
                     }
                 }
 
                 $min = $i;
+            }
+
+            if (isset($visited[$min - 1])) {
+                return $min - 1;
             }
 
             foreach ($instructions as $position => $instruction) {
@@ -145,10 +142,16 @@ class Day8 implements DayInterface
                 $newPosition = $position + $instruction[1];
 
                 if ($newPosition >= $min && $newPosition <= $max) {
-                    $queue[] = $position;
+                    if ($instruction[0] === 'nop' && isset($visited[$position])) {
+                        return $position;
+                    }
+
+                    if ($instruction[0] === 'jmp') {
+                        $queue[] = $position;
+                    }
                 }
             }
-        } while (count($queue) > 0);
+        } while ($queue->count() > 0);
 
         throw new Exception('Position not found');
     }
