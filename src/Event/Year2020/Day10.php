@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Event\Year2020;
 
 use App\Event\DayInterface;
-use SplQueue;
 
 class Day10 implements DayInterface
 {
