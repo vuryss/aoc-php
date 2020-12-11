@@ -44,8 +44,11 @@ class Day11 implements DayInterface
     {
         $grid = array_map('str_split', explode("\n", $input));
         $newState = $grid;
+        $didChange = true;
 
-        while (true) {
+        while ($didChange) {
+            $didChange = false;
+
             foreach ($grid as $y => $line) {
                 foreach ($line as $x => $spot) {
                     if ($spot === '.') continue;
@@ -59,28 +62,31 @@ class Day11 implements DayInterface
                         }
                     }
 
-                    if ($occupiedAround === 0) {
+                    if ($occupiedAround === 0 && $spot !== '#') {
                         $newState[$y][$x] = '#';
-                    } elseif ($occupiedAround >= 4) {
+                        $didChange = true;
+                    } elseif ($occupiedAround >= 4 && $spot !== 'L') {
                         $newState[$y][$x] = 'L';
+                        $didChange = true;
                     }
                 }
             }
 
-            if (serialize($newState) === serialize($grid)) {
-                return (string) $this->countOccupiedSeats($grid);
-            }
-
             $grid = $newState;
         }
+
+        return (string) $this->countOccupiedSeats($grid);
     }
 
     public function solvePart2(string $input): string
     {
         $grid = array_map('str_split', explode("\n", $input));
         $newState = $grid;
+        $didChange = true;
 
-        while (true) {
+        while ($didChange) {
+            $didChange = false;
+
             foreach ($grid as $y => $line) {
                 foreach ($line as $x => $spot) {
                     if ($spot === '.') continue;
@@ -102,20 +108,20 @@ class Day11 implements DayInterface
                         }
                     }
 
-                    if ($occupiedAround === 0) {
+                    if ($occupiedAround === 0 && $spot !== '#') {
                         $newState[$y][$x] = '#';
-                    } elseif ($occupiedAround >= 5) {
+                        $didChange = true;
+                    } elseif ($occupiedAround >= 5 && $spot !== 'L') {
                         $newState[$y][$x] = 'L';
+                        $didChange = true;
                     }
                 }
             }
 
-            if (serialize($newState) === serialize($grid)) {
-                return (string) $this->countOccupiedSeats($grid);
-            }
-
             $grid = $newState;
         }
+
+        return (string) $this->countOccupiedSeats($grid);
     }
 
     private function countOccupiedSeats(array $grid): int
