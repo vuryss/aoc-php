@@ -52,14 +52,12 @@ class Day11 implements DayInterface
 
                     $occupiedAround = 0;
 
-                    if (($grid[$y - 1][$x - 1] ?? '') === '#') $occupiedAround++;
-                    if (($grid[$y - 1][$x] ?? '') === '#') $occupiedAround++;
-                    if (($grid[$y - 1][$x + 1] ?? '') === '#') $occupiedAround++;
-                    if (($grid[$y][$x - 1] ?? '') === '#') $occupiedAround++;
-                    if (($grid[$y][$x + 1] ?? '') === '#') $occupiedAround++;
-                    if (($grid[$y + 1][$x - 1] ?? '') === '#') $occupiedAround++;
-                    if (($grid[$y + 1][$x] ?? '') === '#') $occupiedAround++;
-                    if (($grid[$y + 1][$x + 1] ?? '') === '#') $occupiedAround++;
+                    for ($dy = -1; $dy <= 1; $dy++) {
+                        for ($dx = -1; $dx <= 1; $dx++) {
+                            if ($dy === 0 && $dx === 0) continue;
+                            if (($grid[$y + $dy][$x + $dx] ?? '') === '#') $occupiedAround++;
+                        }
+                    }
 
                     if ($occupiedAround === 0) {
                         $newState[$y][$x] = '#';
@@ -89,75 +87,18 @@ class Day11 implements DayInterface
 
                     $occupiedAround = 0;
 
-                    for ($i = 1; isset($grid[$y - $i][$x - $i]); $i++) {
-                        if ($grid[$y - $i][$x - $i] === '#') {
-                            $occupiedAround++;
-                            break;
-                        } elseif ($grid[$y - $i][$x - $i] === 'L') {
-                            break;
-                        }
-                    }
+                    for ($dy = -1; $dy <= 1; $dy++) {
+                        for ($dx = -1; $dx <= 1; $dx++) {
+                            if ($dy === 0 && $dx === 0) continue;
 
-                    for ($i = 1; isset($grid[$y - $i][$x]); $i++) {
-                        if ($grid[$y - $i][$x] === '#') {
-                            $occupiedAround++;
-                            break;
-                        } elseif ($grid[$y - $i][$x] === 'L') {
-                            break;
-                        }
-                    }
+                            for ($dist = 1; isset($grid[$y + $dy * $dist][$x + $dx * $dist]); $dist++) {
+                                if ($grid[$y + $dy * $dist][$x + $dx * $dist] === 'L') break;
 
-                    for ($i = 1; isset($grid[$y - $i][$x + $i]); $i++) {
-                        if ($grid[$y - $i][$x + $i] === '#') {
-                            $occupiedAround++;
-                            break;
-                        } elseif ($grid[$y - $i][$x + $i] === 'L') {
-                            break;
-                        }
-                    }
-
-                    for ($i = 1; isset($grid[$y][$x - $i]); $i++) {
-                        if ($grid[$y][$x - $i] === '#') {
-                            $occupiedAround++;
-                            break;
-                        } elseif ($grid[$y][$x - $i] === 'L') {
-                            break;
-                        }
-                    }
-
-                    for ($i = 1; isset($grid[$y][$x + $i]); $i++) {
-                        if ($grid[$y][$x + $i] === '#') {
-                            $occupiedAround++;
-                            break;
-                        } elseif ($grid[$y][$x + $i] === 'L') {
-                            break;
-                        }
-                    }
-
-                    for ($i = 1; isset($grid[$y + $i][$x - $i]); $i++) {
-                        if ($grid[$y + $i][$x - $i] === '#') {
-                            $occupiedAround++;
-                            break;
-                        } elseif ($grid[$y + $i][$x - $i] === 'L') {
-                            break;
-                        }
-                    }
-
-                    for ($i = 1; isset($grid[$y + $i][$x]); $i++) {
-                        if ($grid[$y + $i][$x] === '#') {
-                            $occupiedAround++;
-                            break;
-                        } elseif ($grid[$y + $i][$x] === 'L') {
-                            break;
-                        }
-                    }
-
-                    for ($i = 1; isset($grid[$y + $i][$x + $i]); $i++) {
-                        if ($grid[$y + $i][$x + $i] === '#') {
-                            $occupiedAround++;
-                            break;
-                        } elseif ($grid[$y + $i][$x + $i] === 'L') {
-                            break;
+                                if ($grid[$y + $dy * $dist][$x + $dx * $dist] === '#') {
+                                    $occupiedAround++;
+                                    break;
+                                }
+                            }
                         }
                     }
 
