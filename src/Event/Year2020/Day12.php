@@ -54,13 +54,13 @@ class Day12 implements DayInterface
                     $x -= $value;
                     break;
                 case 'L':
-                    $times = ($value) / 90;
+                    $times = $value / 90;
                     for ($i = 0; $i < $times; $i++) {
                         $direction = $leftTurn[$direction];
                     }
                     break;
                 case 'R':
-                    $times = ($value) / 90;
+                    $times = $value / 90;
                     for ($i = 0; $i < $times; $i++) {
                         $direction = $rightTurn[$direction];
                     }
@@ -113,23 +113,22 @@ class Day12 implements DayInterface
                     $wx -= $value;
                     break;
                 case 'L':
-                    $times = ($value) / 90;
+                    $times = $value / 90;
                     for ($i = 0; $i < $times; $i++) {
                         [$wx, $wy] = [-$wy, $wx];
                         $direction = $leftTurn[$direction];
                     }
                     break;
                 case 'R':
-                    $times = ($value) / 90;
+                    $times = $value / 90;
                     for ($i = 0; $i < $times; $i++) {
                         [$wx, $wy] = [$wy, -$wx];
                         $direction = $rightTurn[$direction];
                     }
                     break;
                 case 'F':
-                    $times = $value;
-                    $x += $times * $wx;
-                    $y += $times * $wy;
+                    $x += $value * $wx;
+                    $y += $value * $wy;
                     break;
             }
         }
