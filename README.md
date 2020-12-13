@@ -7,6 +7,7 @@
 ## Requirements
 
 - PHP 7.4
+- GMP extension  
 - Composer
 - Advent of Code account
 

@@ -1,6 +1,7 @@
 {
     "require": {
         "php": "^7.4",
+        "ext-gmp": "*",
         "symfony/console": "^5.2",
         "symfony/flex": "^1.10",
         "symfony/framework-bundle": "^5.2",
