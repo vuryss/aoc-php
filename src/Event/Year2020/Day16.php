@@ -59,6 +59,7 @@ class Day16 implements DayInterface
 
                 if (count($matchingFields) === 0) {
                     unset($data['nearbyTickets'][$ticketIndex]);
+                    break;
                 }
             }
         }
