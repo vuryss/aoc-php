@@ -80,7 +80,7 @@ class Day16 implements DayInterface
 
             if (count($matchedFieldTypes) === 1) {
                 $typeMap[$index] = current($matchedFieldTypes);
-                unset($data['rules'][current($matchedFieldTypes)]);
+                unset($data['rules'][$typeMap[$index]]);
 
                 if (count($data['rules']) === 0) {
                     break;
