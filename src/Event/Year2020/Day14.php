@@ -43,7 +43,7 @@ class Day14 implements DayInterface
 
             preg_match('/mem\[(\d+)]\s=\s(\d+)/', $line, $matches);
             [, $address, $value] = $matches;
-            $value = str_pad(decbin($value), 36, '0', STR_PAD_LEFT);
+            $value = str_pad(decbin((int) $value), 36, '0', STR_PAD_LEFT);
 
             foreach ($mask as $index => $replacement) {
                 $value[$index] = $replacement;
@@ -70,7 +70,7 @@ class Day14 implements DayInterface
 
             preg_match('/mem\[(\d+)]\s=\s(\d+)/', $line, $matches);
             [, $address, $value] = $matches;
-            $address = str_pad(decbin($address), 36, '0', STR_PAD_LEFT);
+            $address = str_pad(decbin((int) $address), 36, '0', STR_PAD_LEFT);
 
             foreach ($mask as $index => $replacement) {
                 if ($replacement === '1') {
