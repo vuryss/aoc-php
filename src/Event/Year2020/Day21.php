@@ -72,13 +72,8 @@ class Day21 implements DayInterface
             }
 
             foreach ($possibleAllergens as $possibleAllergen) {
-                if (!isset($allergensFoods[$possibleAllergen])) {
-                    $allergensFoods[$possibleAllergen] = $foodIngredients;
-                    continue;
-                }
-
                 $allergensFoods[$possibleAllergen] = array_intersect(
-                    $allergensFoods[$possibleAllergen],
+                    $allergensFoods[$possibleAllergen] ?? $foodIngredients,
                     $foodIngredients
                 );
             }
@@ -92,7 +87,6 @@ class Day21 implements DayInterface
                     $ingredients[$possibleFoods[array_key_first($possibleFoods)]]['allergen'] = $allergen;
                     unset($allergensFoods[$allergen]);
                     $change = true;
-                    break;
                 }
             }
 
@@ -100,7 +94,6 @@ class Day21 implements DayInterface
                 foreach ($possibleFoods as $index => $possibleFood) {
                     if ($ingredients[$possibleFood]['allergen'] !== null) {
                         unset($allergensFoods[$allergen][$index]);
-                        $change = true;
                     }
                 }
             }
