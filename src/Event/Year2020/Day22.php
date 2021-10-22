@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Event\Year2020;
 
 use App\Event\DayInterface;
-use Exception;
 
 class Day22 implements DayInterface
 {
