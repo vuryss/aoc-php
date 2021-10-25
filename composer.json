@@ -1,6 +1,7 @@
 {
     "require": {
         "php": "^8.0",
+        "ext-bcmath": "*",
         "ext-gmp": "*",
         "symfony/console": "^5.3",
         "symfony/flex": "^1.10",
