@@ -91,29 +91,19 @@ class Day23 implements DayInterface
     private function playGame(array $cups, int $current, int $moves): array
     {
         for ($i = 1; $i <= $moves; $i++) {
-            $cup = $current;
-            $removedIds = [];
-            $removedStartCup = $cups[$cup];
+            $c1 = $cups[$current];
+            $c2 = $cups[$c1];
+            $c3 = $cups[$c2];
 
-            for ($j = 1; $j <= 3; $j++) {
-                $cup = $cups[$cup];
-                $removedIds[$cup] = true;
-                $removedEndCup = $cup;
-            }
-
-            $cups[$current] = $cups[$removedEndCup];
-            $destinationId = null;
+            $cups[$current] = $cups[$c3];
+            $destinationId = $current;
 
             do {
-                $destinationId = $destinationId !== null ? $destinationId - 1 : $current - 1;
-                if (!isset($cups[$destinationId])) {
-                    $destinationId = $this->highestCupLabel;
-                }
-            } while (isset($removedIds[$destinationId]));
+                isset($cups[--$destinationId]) || $destinationId = $this->highestCupLabel;
+            } while ($destinationId === $c1 || $destinationId === $c2 || $destinationId === $c3);
 
-            $destinationNextCup = $cups[$destinationId];
-            $cups[$destinationId] = $removedStartCup;
-            $cups[$removedEndCup] = $destinationNextCup;
+            $cups[$c3] = $cups[$destinationId];
+            $cups[$destinationId] = $c1;
             $current = $cups[$current];
         }
 
