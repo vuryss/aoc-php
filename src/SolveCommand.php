@@ -38,7 +38,7 @@ class SolveCommand extends Command
                 null,
                 InputOption::VALUE_REQUIRED,
                 'Which year\'s AoC to use.',
-                2020
+                2021
             )
             ->addOption(
                 'test',
@@ -59,7 +59,7 @@ class SolveCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->output = $output;
-        $year = $input->hasOption('event') ? (int) $input->getOption('event') : 2020;
+        $year = (int) $input->getOption('event');
         $day = (int) $input->getArgument('day');
         $runTests = $input->getOption('test');
 
