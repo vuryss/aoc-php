@@ -38,12 +38,12 @@ class Day2 implements DayInterface
         $depth = $pos = 0;
 
         foreach ($commands as $command) {
-            [$command, $value] = explode(' ', $command);
+            [$command, $value] = sscanf($command, '%s %d');
 
             match ($command) {
-                'forward' => $pos += (int) $value,
-                'up' => $depth -= (int) $value,
-                'down' => $depth += (int) $value,
+                'forward' => $pos += $value,
+                'up' => $depth -= $value,
+                'down' => $depth += $value,
             };
         }
 
@@ -56,20 +56,12 @@ class Day2 implements DayInterface
         $depth = $pos = $aim = 0;
 
         foreach ($commands as $command) {
-            [$command, $value] = explode(' ', $command);
-
-            switch ($command) {
-                case 'forward':
-                    $pos += (int) $value;
-                    $depth += $aim * (int) $value;
-                    break;
-                case 'up':
-                    $aim -= (int) $value;
-                    break;
-                case 'down':
-                    $aim += (int) $value;
-                    break;
-            }
+            [$command, $value] = sscanf($command, '%s %d');
+            [$depth, $pos, $aim] = match ($command) {
+                'forward' => [$depth + $aim * $value, $pos + $value, $aim],
+                'up' => [$depth, $pos, $aim - $value],
+                'down' => [$depth, $pos, $aim + $value],
+            };
         }
 
         return (string) ($depth * $pos);
