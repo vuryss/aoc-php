@@ -43,31 +43,25 @@ class Day1 implements DayInterface
     public function solvePart1(string $input): string
     {
         $depths = array_map('intval', explode("\n", $input));
-        $previous = array_shift($depths);
-        $count = 0;
+        $count = array_reduce(
+            $depths,
+            static fn ($carry, $item): array => [$carry[0] + (int) ($item > $carry[1]), $item],
+            [0, array_shift($depths)]
+        );
 
-        foreach ($depths as $depth) {
-            if ($depth > $previous) {
-                $count++;
-            }
-            $previous = $depth;
-        }
-
-        return (string) $count;
+        return (string) $count[0];
     }
 
     public function solvePart2(string $input): string
     {
         $depths = array_map('intval', explode("\n", $input));
+        $previous = array_splice($depths, 0, 3);
         $count = 0;
 
-        for ($i = 0, $end = count($depths) - 3; $i < $end; $i++) {
-            $window1 = $depths[$i] + $depths[$i + 1] + $depths[$i + 2];
-            $window2 = $depths[$i + 1] + $depths[$i + 2] + $depths[$i + 3];
-
-            if ($window2 > $window1) {
-                $count++;
-            }
+        while ($item = array_shift($depths)) {
+            $window = [$previous[1], $previous[2], $item];
+            $count += (int) (array_sum($window) > array_sum($previous));
+            $previous = $window;
         }
 
         return (string) $count;
