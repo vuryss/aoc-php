@@ -70,25 +70,17 @@ class Day4 implements DayInterface
 
     private function getWinningScore(string $game, bool $last = false): int
     {
-        $input = explode("\n\n", $game);
-        $numbers = array_shift($input);
-        $boardsInput = $input;
-        $boards = [];
-        $marked = [];
+        $boardsInput = explode("\n\n", $game);
+        $numbers = array_map('intval', explode(',', array_shift($boardsInput)));
+        $boards = $marked = $winBoards = [];
 
-        foreach ($boardsInput as $index => $boardInput) {
+        foreach ($boardsInput as $boardIndex => $boardInput) {
             $lines = explode("\n", $boardInput);
-            foreach ($lines as $lineNum => $line) {
-                $boards[$index][$lineNum] = array_map('intval', preg_split('/\s+/', trim($line)));
-                $marked[$index][$lineNum] = [0, 0, 0, 0, 0];
+            foreach ($lines as $lineIndex => $line) {
+                $boards[$boardIndex][$lineIndex] = sscanf($line, '%d %d %d %d %d');
+                $marked[$boardIndex][$lineIndex] = [0, 0, 0, 0, 0];
             }
         }
-
-        $numbers = array_map('intval', explode(',', $numbers));
-        $winBoard = null;
-        $winNumber = null;
-
-        $winBoards = [];
 
         foreach ($numbers as $number) {
             foreach ($boards as $bid =>  $board) {
@@ -105,12 +97,10 @@ class Day4 implements DayInterface
                 $countCols = [];
                 foreach ($board as $line) {
                     if (array_sum($line) === 5) {
-                        $winBoard = $bid;
-                        $winNumber = $number;
                         $winBoards[$bid] = true;
 
                         if (!$last || count($winBoards) === count($boards)) {
-                            break 3;
+                            return $this->calculateScore($boards[$bid], $marked[$bid], $number);
                         }
                     }
                 }
@@ -121,28 +111,29 @@ class Day4 implements DayInterface
 
                 foreach ($countCols as $countCol) {
                     if ($countCol === 5) {
-                        $winBoard = $bid;
-                        $winNumber = $number;
                         $winBoards[$bid] = true;
 
                         if (!$last || count($winBoards) === count($boards)) {
-                            break 3;
+                            return $this->calculateScore($boards[$bid], $marked[$bid], $number);
                         }
                     }
                 }
             }
         }
 
+        return -1;
+    }
+
+    private function calculateScore(array $board, array $marked, int $number): int
+    {
         $sum = 0;
 
-        foreach ($marked[$winBoard] as $lineIndex => $line) {
-            foreach ($line as $position => $marked) {
-                if ($marked !== 1) {
-                    $sum += $boards[$winBoard][$lineIndex][$position];
-                }
+        foreach ($marked as $lineIndex => $line) {
+            foreach ($line as $position => $isMarked) {
+                $sum += $isMarked === 1 ? 0 : $board[$lineIndex][$position];
             }
         }
 
-        return $sum * $winNumber;
+        return $sum * $number;
     }
 }
