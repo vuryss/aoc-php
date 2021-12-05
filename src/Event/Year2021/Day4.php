@@ -72,68 +72,32 @@ class Day4 implements DayInterface
     {
         $boardsInput = explode("\n\n", $game);
         $numbers = array_map('intval', explode(',', array_shift($boardsInput)));
-        $boards = $marked = $winBoards = [];
-
-        foreach ($boardsInput as $boardIndex => $boardInput) {
-            $lines = explode("\n", $boardInput);
-            foreach ($lines as $lineIndex => $line) {
-                $boards[$boardIndex][$lineIndex] = sscanf($line, '%d %d %d %d %d');
-                $marked[$boardIndex][$lineIndex] = [0, 0, 0, 0, 0];
-            }
-        }
+        $columnMarks = $rowMarks = $results = [];
+        $boards = array_map(static fn ($b): array => sscanf($b, str_repeat('%d ', 25)), $boardsInput);
 
         foreach ($numbers as $number) {
-            foreach ($boards as $bid =>  $board) {
-                foreach ($board as $lid =>  $line) {
-                    foreach ($line as $nid => $num) {
-                        if ($num === $number) {
-                            $marked[$bid][$lid][$nid] = 1;
-                        }
-                    }
-                }
-            }
+            foreach ($boards as $boardIndex => &$board) {
+                $matchIndex = array_search($number, $board, true);
 
-            foreach ($marked as $bid => $board) {
-                $countCols = [];
-                foreach ($board as $line) {
-                    if (array_sum($line) === 5) {
-                        $winBoards[$bid] = true;
-
-                        if (!$last || count($winBoards) === count($boards)) {
-                            return $this->calculateScore($boards[$bid], $marked[$bid], $number);
-                        }
-                    }
+                if ($matchIndex === false) {
+                    continue;
                 }
 
-                for ($i = 0; $i < 5; $i++) {
-                    $countCols[$i] = array_sum(array_column($board, $i));
-                }
+                $col = $matchIndex % 5;
+                $row = (int) floor($matchIndex / 5);
 
-                foreach ($countCols as $countCol) {
-                    if ($countCol === 5) {
-                        $winBoards[$bid] = true;
+                $columnMarks[$boardIndex][$col] = ($columnMarks[$boardIndex][$col] ?? 0) + 1;
+                $rowMarks[$boardIndex][$row] = ($rowMarks[$boardIndex][$row] ?? 0) + 1;
 
-                        if (!$last || count($winBoards) === count($boards)) {
-                            return $this->calculateScore($boards[$bid], $marked[$bid], $number);
-                        }
-                    }
+                $board[$matchIndex] = null;
+
+                if ($columnMarks[$boardIndex][$col] === 5 || $rowMarks[$boardIndex][$row] === 5) {
+                    $results[$boardIndex] = array_sum($board) * $number;
+                    unset($boards[$boardIndex]);
                 }
             }
         }
 
-        return -1;
-    }
-
-    private function calculateScore(array $board, array $marked, int $number): int
-    {
-        $sum = 0;
-
-        foreach ($marked as $lineIndex => $line) {
-            foreach ($line as $position => $isMarked) {
-                $sum += $isMarked === 1 ? 0 : $board[$lineIndex][$position];
-            }
-        }
-
-        return $sum * $number;
+        return $last ? $results[array_key_last($results)] : $results[array_key_first($results)];
     }
 }
