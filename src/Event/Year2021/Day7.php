@@ -25,20 +25,14 @@ class Day7 implements DayInterface
     public function solvePart1(string $input): string
     {
         $positions = array_map('intval', explode(',', $input));
-        $min = min($positions);
-        $max = max($positions);
         $fuel = PHP_INT_MAX;
 
-        for ($i = $min; $i <= $max; $i++) {
-            $sum = 0;
-
+        for ($i = min($positions), $max = max($positions), $sum = 0; $i <= $max; $i++) {
             foreach ($positions as $position) {
                 $sum += abs($position - $i);
             }
 
-            if ($sum < $fuel) {
-                $fuel = $sum;
-            }
+            $fuel = min($fuel, $sum);
         }
 
         return (string) $fuel;
@@ -47,21 +41,15 @@ class Day7 implements DayInterface
     public function solvePart2(string $input): string
     {
         $positions = array_map('intval', explode(',', $input));
-        $min = min($positions);
-        $max = max($positions);
         $fuel = PHP_INT_MAX;
 
-        for ($i = $min; $i <= $max; $i++) {
-            $sum = 0;
-
+        for ($i = min($positions), $max = max($positions), $sum = 0; $i <= $max; $i++) {
             foreach ($positions as $position) {
                 $steps = abs($position - $i);
                 $sum += $steps * ($steps + 1) / 2;
             }
 
-            if ($sum < $fuel) {
-                $fuel = $sum;
-            }
+            $fuel = min($fuel, $sum);
         }
 
         return (string) $fuel;
