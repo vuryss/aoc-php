@@ -70,11 +70,7 @@ class Day10 implements DayInterface
             [$invalid[],] = $this->parseLine($chars);
         }
 
-        $sum = array_reduce(
-            $invalid,
-            static fn ($score, $char): int => $char ? $score + self::SCORE_INVALID[$char] : $score,
-            0
-        );
+        $sum = array_reduce($invalid, fn ($score, $char) => $char ? $score + self::SCORE_INVALID[$char] : $score,0);
 
         return (string) $sum;
     }
@@ -87,11 +83,7 @@ class Day10 implements DayInterface
         foreach ($lines as $chars) {
             [, $missing] = $this->parseLine($chars);
 
-            $score[] = array_reduce(
-                $missing,
-                static fn ($score, $char): int => $score * 5 + self::SCORE_INCOMPLETE[$char],
-                0
-            );
+            $score[] = array_reduce($missing, fn ($score, $char) => $score * 5 + self::SCORE_INCOMPLETE[$char], 0);
         }
 
         $score = array_filter($score);
