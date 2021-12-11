@@ -59,17 +59,13 @@ class Day11 implements DayInterface
         $flashCounter = 0;
 
         for ($step = 1; $step <= 100; $step++) {
-            $stepFlashCounter = 0;
-
             foreach ($octopuses as $octopus) {
-                $stepFlashCounter += $octopus->energize();
+                $flashCounter += $octopus->energize();
             }
 
             foreach ($octopuses as $octopus) {
                 $octopus->rest();
             }
-
-            $flashCounter += $stepFlashCounter;
         }
 
         return (string) $flashCounter;
