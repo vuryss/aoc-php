@@ -8,7 +8,7 @@
 ## Requirements
 
 - PHP 8.0
-- GMP and BCMath extensions
+- GMP, BCMath and DS extensions
 - Composer
 - Advent of Code account
 
