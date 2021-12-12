@@ -124,7 +124,7 @@ class Day12 implements DayInterface
                     continue;
                 }
 
-                $queue->push([$caves[$caveName], array_merge($path, [$caveName => true])]);
+                $queue->push([$caves[$caveName], $path + [$caveName => true]]);
             }
         }
 
@@ -158,7 +158,7 @@ class Day12 implements DayInterface
                     $currentTwiceFlag = true;
                 }
 
-                $queue->push([$caves[$caveName], array_merge($path, [$caveName => true]), $currentTwiceFlag]);
+                $queue->push([$caves[$caveName], $path + [$caveName => true], $currentTwiceFlag]);
             }
         }
 
