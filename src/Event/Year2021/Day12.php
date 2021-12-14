@@ -136,14 +136,14 @@ class Day12 implements DayInterface
         $caves = $this->parseCaves($input);
 
         $queue = new Queue([[$caves['start'], ['start' => true], false]]);
-        $endPaths = [];
+        $endPaths = 0;
 
         while (!$queue->isEmpty()) {
             /** @var Cave $current */
             [$current, $path, $twiceFlag] = $queue->pop();
 
             if ($current->isEnd) {
-                $endPaths[] = $path;
+                $endPaths++;
                 continue;
             }
 
@@ -162,7 +162,7 @@ class Day12 implements DayInterface
             }
         }
 
-        return (string) count($endPaths);
+        return (string) $endPaths;
     }
 
     /**
