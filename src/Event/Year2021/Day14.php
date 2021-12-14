@@ -85,15 +85,15 @@ class Day14 implements DayInterface
         }
 
         for ($step = 1; $step <= $steps; $step++) {
-            $tempCounters = $pairCounter;
+            $tempPairCounter = $pairCounter;
 
             foreach ($pairCounter as $pair => $value) {
-                $tempCounters[$pair] -= $value;
-                $tempCounters[$pair[0] . $between[$pair]] += $value;
-                $tempCounters[$between[$pair] . $pair[1]] += $value;
+                $tempPairCounter[$pair] -= $value;
+                $tempPairCounter[$pair[0] . $between[$pair]] += $value;
+                $tempPairCounter[$between[$pair] . $pair[1]] += $value;
             }
 
-            $pairCounter = $tempCounters;
+            $pairCounter = $tempPairCounter;
         }
 
         // Increase first and last by one, so they are equally present twice as the other characters.
