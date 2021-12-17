@@ -33,6 +33,10 @@ class Day17 implements DayInterface
 
         foreach ($possibleX as $initX) {
             foreach ($possibleY as $initY) {
+                if ($initY <= 0) {
+                    continue;
+                }
+
                 $xVelocity = $initX;
                 $yVelocity = $initY;
                 $tempMaxHeight = 0;
