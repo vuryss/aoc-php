@@ -27,15 +27,17 @@ class Day17 implements DayInterface
     {
         [$targetMinX, $targetMaxX, $targetMinY, $targetMaxY] = sscanf($input, 'target area: x=%d..%d, y=%d..%d');
 
-        $possibleX = $this->determinePossibleXVelocities($targetMinX, $targetMaxX);
+        $possibleX = $this->determinePossibleHorizontalVelocities($targetMinX, $targetMaxX);
+        $possibleY = $this->determinePossibleVerticalVelocities($targetMaxY, $targetMinY);
         $maxHeight = 0;
 
-        foreach (array_keys($possibleX) as $initX) {
-            for ($initY = 0; $initY <= abs($targetMinY); $initY++) {
+        foreach ($possibleX as $initX) {
+            foreach ($possibleY as $initY) {
                 $xVelocity = $initX;
                 $yVelocity = $initY;
                 $tempMaxHeight = 0;
                 $position = new Point2(0, 0);
+
                 while (true) {
                     $position->x += $xVelocity > 0 ? $xVelocity-- : 0;
                     $position->y += $yVelocity--;
@@ -68,15 +70,16 @@ class Day17 implements DayInterface
     {
         [$targetMinX, $targetMaxX, $targetMinY, $targetMaxY] = sscanf($input, 'target area: x=%d..%d, y=%d..%d');
 
-        $possibleX = $this->determinePossibleXVelocities($targetMinX, $targetMaxX);
-
+        $possibleX = $this->determinePossibleHorizontalVelocities($targetMinX, $targetMaxX);
+        $possibleY = $this->determinePossibleVerticalVelocities($targetMaxY, $targetMinY);
         $allVelocities = [];
 
-        foreach (array_keys($possibleX) as $initX) {
-            for ($initY = $targetMinY; $initY <= abs($targetMinY); $initY++) {
+        foreach ($possibleX as $initX) {
+            foreach ($possibleY as $initY) {
                 $xVelocity = $initX;
                 $yVelocity = $initY;
                 $position = new Point2(0, 0);
+
                 while (true) {
                     $position->x += $xVelocity > 0 ? $xVelocity-- : 0;
                     $position->y += $yVelocity--;
@@ -101,7 +104,7 @@ class Day17 implements DayInterface
         return (string) count($allVelocities);
     }
 
-    private function determinePossibleXVelocities(int $xTargetStart, int $xTargetEnd): array
+    private function determinePossibleHorizontalVelocities(int $xTargetStart, int $xTargetEnd): array
     {
         $possibleX = [];
 
@@ -122,6 +125,30 @@ class Day17 implements DayInterface
             }
         }
 
-        return $possibleX;
+        return array_keys($possibleX);
+    }
+
+    private function determinePossibleVerticalVelocities(int $yTargetStart, int $yTargetEnd): array
+    {
+        $possibleY = [];
+
+        for ($y = $yTargetEnd; $y <= abs($yTargetEnd); $y++) {
+            $yVelocity = $y;
+            $yPosition = 0;
+
+            while (true) {
+                $yPosition += $yVelocity--;
+
+                if ($yPosition <= $yTargetStart && $yPosition >= $yTargetEnd) {
+                    $possibleY[$y] = true;
+                }
+
+                if ($yPosition < $yTargetEnd) {
+                    break;
+                }
+            }
+        }
+
+        return array_keys($possibleY);
     }
 }
