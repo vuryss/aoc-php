@@ -104,31 +104,22 @@ class SnailfishNumber
                 $carryLeft = (int) $this->leftSide->leftSide;
                 $carryRight = (int) $this->leftSide->rightSide;
                 $this->leftSide = 0;
+                $hasExploded = true;
+            } else {
+                $hasExploded = $this->leftSide->explode($carryLeft, $carryRight);
+            }
 
+            if ($carryRight !== null) {
                 if ($this->rightSide instanceof self) {
-                    // Pass only right value to the right side, to be set on the leftmost node there
-                    $dummyLeft = null;
-                    $this->rightSide->explode($dummyLeft, $carryRight);
+                    $this->rightSide->explode($carryLeft, $carryRight);
                 } else {
                     // Set right value to the right node only if the current level left node is the one that exploded.
                     $this->rightSide += $carryRight;
                     $carryRight = null;
                 }
-
-                return true;
             }
 
-            if ($this->leftSide->explode($carryLeft, $carryRight)) {
-                if ($carryRight !== null) {
-                    if (is_int($this->rightSide)) {
-                        $this->rightSide += $carryRight;
-                        $carryRight = null;
-                    } else {
-                        $dummyLeft = null;
-                        $this->rightSide->explode($dummyLeft, $carryRight);
-                    }
-                }
-
+            if ($hasExploded) {
                 return true;
             }
         }
@@ -138,30 +129,22 @@ class SnailfishNumber
                 $carryLeft = (int) $this->rightSide->leftSide;
                 $carryRight = (int) $this->rightSide->rightSide;
                 $this->rightSide = 0;
+                $hasExploded = true;
+            } else {
+                $hasExploded = $this->rightSide->explode($carryLeft, $carryRight);
+            }
 
+            if ($carryLeft !== null) {
                 if ($this->leftSide instanceof self) {
-                    // Pass only left value to tbe left side, to be set on the rightmost node there
-                    $dummyRight = null;
-                    $this->leftSide->explode($carryLeft, $dummyRight);
+                    $this->leftSide->explode($carryLeft, $carryRight);
                 } else {
                     // Set left value to the left node only if the current level right node is the one that exploded
                     $this->leftSide += $carryLeft;
                     $carryLeft = null;
                 }
-
-                return true;
             }
 
-            if ($this->rightSide->explode($carryLeft, $carryRight)) {
-                if ($carryLeft !== null) {
-                    if (is_int($this->leftSide)) {
-                        $this->leftSide += $carryLeft;
-                        $carryLeft = null;
-                    } else {
-                        $this->leftSide->explode($carryLeft, $carryRight);
-                    }
-                }
-
+            if ($hasExploded) {
                 return true;
             }
         }
