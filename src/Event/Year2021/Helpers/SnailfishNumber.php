@@ -73,7 +73,8 @@ class SnailfishNumber
 
     private function explode(?int &$carryLeft = null, ?int &$carryRight = null): bool
     {
-        // Set right value to leftmost node
+        // If we have to carry the right number, it should be set to the leftmost node
+        // (closest to the right of exploded node)
         if ($carryRight !== null) {
             if ($this->leftSide instanceof self) {
                 $this->leftSide->explode($carryLeft, $carryRight);
@@ -85,7 +86,8 @@ class SnailfishNumber
             return true;
         }
 
-        // Set left value to the rightmost node
+        // If we carry the left number, it should be set to the rightmost node
+        // (closest to the left to exploded node)
         if ($carryLeft !== null) {
             if ($this->rightSide instanceof self) {
                 $this->rightSide->explode($carryLeft, $carryRight);
@@ -108,7 +110,7 @@ class SnailfishNumber
                     $dummyLeft = null;
                     $this->rightSide->explode($dummyLeft, $carryRight);
                 } else {
-                    // Set right value to the right node only if the current left node is the one that exploded.
+                    // Set right value to the right node only if the current level left node is the one that exploded.
                     $this->rightSide += $carryRight;
                     $carryRight = null;
                 }
@@ -137,12 +139,14 @@ class SnailfishNumber
                 $carryRight = (int) $this->rightSide->rightSide;
                 $this->rightSide = 0;
 
-                if (is_int($this->leftSide)) {
-                    $this->leftSide += $carryLeft;
-                    $carryLeft = null;
-                } else {
+                if ($this->leftSide instanceof self) {
+                    // Pass only left value to tbe left side, to be set on the rightmost node there
                     $dummyRight = null;
                     $this->leftSide->explode($carryLeft, $dummyRight);
+                } else {
+                    // Set left value to the left node only if the current level right node is the one that exploded
+                    $this->leftSide += $carryLeft;
+                    $carryLeft = null;
                 }
 
                 return true;
@@ -157,6 +161,7 @@ class SnailfishNumber
                         $this->leftSide->explode($carryLeft, $carryRight);
                     }
                 }
+
                 return true;
             }
         }
