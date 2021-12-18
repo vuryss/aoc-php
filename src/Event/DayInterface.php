@@ -16,16 +16,16 @@ interface DayInterface
     /**
      * @param string $input
      *
-     * @return string
+     * @return string|int
      * @throws Exception
      */
-    public function solvePart1(string $input): string;
+    public function solvePart1(string $input): string|int;
 
     /**
      * @param string $input
      *
-     * @return string
+     * @return string|int
      * @throws Exception
      */
-    public function solvePart2(string $input): string;
+    public function solvePart2(string $input): string|int;
 }

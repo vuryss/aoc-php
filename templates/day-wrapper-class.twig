@@ -1,0 +1,38 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Event\Year{{ event }};
+
+use App\Event\DayInterface;
+
+class Day{{ day}} implements DayInterface
+{
+    public function testPart1(): iterable
+    {
+        yield 'result' => <<<'INPUT'
+            test input
+            INPUT;
+    }
+
+    public function testPart2(): iterable
+    {
+        yield 'result' => <<<'INPUT'
+            test input
+            INPUT;
+    }
+
+    public function solvePart1(string $input): string|int
+    {
+        // TODO: Solve part 1 of the challenge
+
+        return 'result';
+    }
+
+    public function solvePart2(string $input): string|int
+    {
+        // TODO: Solve part 2 of the challenge
+
+        return 'result';
+    }
+}

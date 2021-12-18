@@ -103,11 +103,9 @@ class SolveCommand extends Command
     }
 
     /**
-     * @param DayInterface $eventDay
-     *
      * @throws Exception
      */
-    private function runTestsForDay(DayInterface $eventDay)
+    private function runTestsForDay(DayInterface $eventDay): void
     {
         $formatter = $this->getHelper('formatter');
 
@@ -115,16 +113,16 @@ class SolveCommand extends Command
             $formatter->formatBlock('Executing tests for part 1', 'comment', true)
         );
 
-        $this->runTests($eventDay->testPart1(), fn ($input) => $eventDay->solvePart1($input));
+        $this->runTests($eventDay->testPart1(), fn ($input) => (string) $eventDay->solvePart1($input));
 
         $this->output->writeln(
             $formatter->formatBlock('Executing tests for part 2', 'comment', true)
         );
 
-        $this->runTests($eventDay->testPart2(), fn ($input) => $eventDay->solvePart2($input));
+        $this->runTests($eventDay->testPart2(), fn ($input) => (string) $eventDay->solvePart2($input));
     }
 
-    private function runTests(iterable $tests, callable $solveFn)
+    private function runTests(iterable $tests, callable $solveFn): void
     {
         $testNumber = 1;
 
