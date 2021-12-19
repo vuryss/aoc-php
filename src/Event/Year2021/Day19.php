@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Event\Year2021;
 
 use App\Event\DayInterface;
+use App\Event\Year2021\Helpers\Beacon;
 use App\Event\Year2021\Helpers\Point3;
 use App\Event\Year2021\Helpers\Scanner;
 
@@ -296,118 +297,31 @@ class Day19 implements DayInterface
 
     public function solvePart1(string $input): string|int
     {
-        $scannersInput = explode("\n\n", $input);
-        $scanners = [];
+        $scanners = $this->parseSpace($input);
 
-        foreach ($scannersInput as $index => $scannerInput) {
-            $scannerInput = explode("\n", $scannerInput);
-            array_shift($scannerInput);
-
-            $scanners[$index] = new Scanner($index);
-
-            foreach ($scannerInput as $beaconIndex => $coords) {
-                $scanners[$index]->beacons[$beaconIndex]['coords'] = new Point3(
-                    ...array_map('intval', explode(',', $coords))
-                );
-            }
-        }
-
-        foreach ($scanners as $scanner) {
-            $scanner->calculateDistancesBetweenBeacons();
-        }
-
-        $scanner0 = $scanners[0];
-        unset($scanners[0]);
-
-        while (count($scanners) > 0) {
-            foreach ($scanner0->beacons as $beacon) {
-                foreach ($scanners as $scannerIndex => $scanner){
-                    $countBeacons = count($scanner->beacons);
-
-                    foreach ($scanner->beacons as $beacon2) {
-                        $intersectingBeacons = array_intersect($beacon['distance'], $beacon2['distance']);
-
-                        if (count($intersectingBeacons) >= 11) {
-
-                            $distance = current($intersectingBeacons);
-                            $s0b1 = $beacon['coords'];
-                            $secondIndex = array_search($distance, $beacon['distance'], true);
-                            $s0b2 = $scanner0->beacons[$secondIndex]['coords'];
-                            $s0distances = [
-                                'x' => $s0b2->x - $s0b1->x,
-                                'y' => $s0b2->y - $s0b1->y,
-                                'z' => $s0b2->z - $s0b1->z,
-                            ];
-                            $s0distances2 = array_map(fn ($a) => $a ** 2, $s0distances);
-
-                            $s1b1 = $beacon2['coords'];
-                            $secondIndex = array_search($distance, $beacon2['distance'], true);
-                            $s1b2 = $scanner->beacons[$secondIndex]['coords'];
-
-                            $s1distances = [
-                                'x' => $s1b2->x - $s1b1->x,
-                                'y' => $s1b2->y - $s1b1->y,
-                                'z' => $s1b2->z - $s1b1->z,
-                            ];
-                            $s1distances2 = array_map(fn ($a) => $a ** 2, $s1distances);
-
-                            $map = [];
-
-                            foreach (['x', 'y', 'z'] as $coordinate) {
-                                $mappedCoordinate = array_search($s0distances2[$coordinate], $s1distances2, true);
-                                $inversed = $s0distances[$coordinate] !== $s1distances[$mappedCoordinate];
-
-                                $scanner->coordinates->{$coordinate} = $inversed
-                                    ? $s0b1->{$coordinate} + $s1b1->{$mappedCoordinate}
-                                    : $s0b1->{$coordinate} - $s1b1->{$mappedCoordinate};
-
-                                $map[$coordinate] = [
-                                    $mappedCoordinate,
-                                    $inversed,
-                                ];
-                            }
-
-                            foreach ($scanner->beacons as $scannerBeacon) {
-                                $coords = new Point3();
-
-                                foreach ($map as $coordinate => [$mappedCoordinate, $inversed]) {
-                                    $coords->{$coordinate} = $inversed
-                                        ? $scanner->coordinates->{$coordinate} - $scannerBeacon['coords']->{$mappedCoordinate}
-                                        : $scanner->coordinates->{$coordinate} + $scannerBeacon['coords']->{$mappedCoordinate};
-                                }
-
-                                $exists = false;
-
-                                foreach ($scanner0->beacons as $beacon) {
-                                    if ($beacon['coords']->equalsTo($coords)) {
-                                        $exists = true;
-                                        break;
-                                    }
-                                }
-
-                                if (!$exists) {
-                                    $scanner0->beacons[] = ['coords' => $coords];
-                                }
-                            }
-
-                            $scanner0->calculateDistancesBetweenBeacons();
-                            unset($scanners[$scannerIndex]);
-
-                            break 3;
-                        }
-
-                        if (--$countBeacons < 12) {
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-
-        return count($scanner0->beacons);
+        return count($scanners[0]->beacons);
     }
 
     public function solvePart2(string $input): string|int
+    {
+        $scanners = $this->parseSpace($input);
+
+        $max = 0;
+
+        foreach ($scanners as $scanner) {
+            foreach ($scanners as $scanner2) {
+                $dist = abs($scanner->coordinates->x - $scanner2->coordinates->x)
+                    + abs($scanner->coordinates->y - $scanner2->coordinates->y)
+                    + abs($scanner->coordinates->z - $scanner2->coordinates->z);
+
+                $max = max($max, $dist);
+            }
+        }
+
+        return $max;
+    }
+
+    private function parseSpace(string $input): array
     {
         $scannersInput = explode("\n\n", $input);
         $scanners = [];
@@ -419,9 +333,8 @@ class Day19 implements DayInterface
             $scanners[$index] = new Scanner($index);
 
             foreach ($scannerInput as $beaconIndex => $coords) {
-                $scanners[$index]->beacons[$beaconIndex]['coords'] = new Point3(
-                    ...array_map('intval', explode(',', $coords))
-                );
+                $beacon = new Beacon(new Point3(...array_map('intval', explode(',', $coords))));
+                $scanners[$index]->beacons[$beaconIndex] = $beacon;
             }
         }
 
@@ -439,14 +352,14 @@ class Day19 implements DayInterface
                     $countBeacons = count($scanner->beacons);
 
                     foreach ($scanner->beacons as $beacon2) {
-                        $intersectingBeacons = array_intersect($beacon['distance'], $beacon2['distance']);
+                        $intersectingBeacons = array_intersect($beacon->distanceTo, $beacon2->distanceTo);
 
                         if (count($intersectingBeacons) >= 11) {
 
                             $distance = current($intersectingBeacons);
-                            $s0b1 = $beacon['coords'];
-                            $secondIndex = array_search($distance, $beacon['distance'], true);
-                            $s0b2 = $scanner0->beacons[$secondIndex]['coords'];
+                            $s0b1 = $beacon->coordinates;
+                            $secondIndex = array_search($distance, $beacon->distanceTo, true);
+                            $s0b2 = $scanner0->beacons[$secondIndex]->coordinates;
                             $s0distances = [
                                 'x' => $s0b2->x - $s0b1->x,
                                 'y' => $s0b2->y - $s0b1->y,
@@ -454,9 +367,9 @@ class Day19 implements DayInterface
                             ];
                             $s0distances2 = array_map(fn ($a) => $a ** 2, $s0distances);
 
-                            $s1b1 = $beacon2['coords'];
-                            $secondIndex = array_search($distance, $beacon2['distance'], true);
-                            $s1b2 = $scanner->beacons[$secondIndex]['coords'];
+                            $s1b1 = $beacon2->coordinates;
+                            $secondIndex = array_search($distance, $beacon2->distanceTo, true);
+                            $s1b2 = $scanner->beacons[$secondIndex]->coordinates;
 
                             $s1distances = [
                                 'x' => $s1b2->x - $s1b1->x,
@@ -486,21 +399,21 @@ class Day19 implements DayInterface
 
                                 foreach ($map as $coordinate => [$mappedCoordinate, $inversed]) {
                                     $coords->{$coordinate} = $inversed
-                                        ? $scanner->coordinates->{$coordinate} - $scannerBeacon['coords']->{$mappedCoordinate}
-                                        : $scanner->coordinates->{$coordinate} + $scannerBeacon['coords']->{$mappedCoordinate};
+                                        ? $scanner->coordinates->{$coordinate} - $scannerBeacon->coordinates->{$mappedCoordinate}
+                                        : $scanner->coordinates->{$coordinate} + $scannerBeacon->coordinates->{$mappedCoordinate};
                                 }
 
                                 $exists = false;
 
                                 foreach ($scanner0->beacons as $beacon) {
-                                    if ($beacon['coords']->equalsTo($coords)) {
+                                    if ($beacon->coordinates->equalsTo($coords)) {
                                         $exists = true;
                                         break;
                                     }
                                 }
 
                                 if (!$exists) {
-                                    $scanner0->beacons[] = ['coords' => $coords];
+                                    $scanner0->beacons[] = new Beacon($coords);
                                 }
                             }
 
@@ -518,18 +431,6 @@ class Day19 implements DayInterface
             }
         }
 
-        $max = 0;
-
-        foreach ($allScanners as $scanner) {
-            foreach ($allScanners as $scanner2) {
-                $dist = abs($scanner->coordinates->x - $scanner2->coordinates->x)
-                    + abs($scanner->coordinates->y - $scanner2->coordinates->y)
-                    + abs($scanner->coordinates->z - $scanner2->coordinates->z);
-
-                $max = max($max, $dist);
-            }
-        }
-
-        return $max;
+        return $allScanners;
     }
 }
