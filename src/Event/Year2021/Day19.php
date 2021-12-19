@@ -357,7 +357,7 @@ class Day19 implements DayInterface
                         if (count($intersectingBeacons) >= 11) {
 
                             $distance = key($intersectingBeacons);
-                            $secondIndex = array_search($distance, $beacon->distanceTo, true);
+                            $secondIndex = $beacon->distances[$distance];
 
                             $s0b1 = $beacon->coordinates;
                             $s0b2 = $scanner0->beacons[$secondIndex]->coordinates;
@@ -368,8 +368,8 @@ class Day19 implements DayInterface
                             ];
                             $s0absoluteDistances = array_map('abs', $s0distances);
 
+                            $secondIndex = $beacon2->distances[$distance];
                             $s1b1 = $beacon2->coordinates;
-                            $secondIndex = array_search($distance, $beacon2->distanceTo, true);
                             $s1b2 = $scanner->beacons[$secondIndex]->coordinates;
 
                             $s1distances = [
