@@ -348,7 +348,7 @@ class Day19 implements DayInterface
 
         while (count($scanners) > 0) {
             foreach ($scanner0->beacons as $beacon) {
-                foreach ($scanners as $scannerIndex => $scanner){
+                foreach ($scanners as $scannerIndex => $scanner) {
                     $countBeacons = count($scanner->beacons);
 
                     foreach ($scanner->beacons as $beacon2) {
@@ -357,15 +357,16 @@ class Day19 implements DayInterface
                         if (count($intersectingBeacons) >= 11) {
 
                             $distance = current($intersectingBeacons);
+                            $secondIndex = key($intersectingBeacons);
+
                             $s0b1 = $beacon->coordinates;
-                            $secondIndex = array_search($distance, $beacon->distanceTo, true);
                             $s0b2 = $scanner0->beacons[$secondIndex]->coordinates;
                             $s0distances = [
                                 'x' => $s0b2->x - $s0b1->x,
                                 'y' => $s0b2->y - $s0b1->y,
                                 'z' => $s0b2->z - $s0b1->z,
                             ];
-                            $s0distances2 = array_map(fn ($a) => $a ** 2, $s0distances);
+                            $s0absoluteDistances = array_map('abs', $s0distances);
 
                             $s1b1 = $beacon2->coordinates;
                             $secondIndex = array_search($distance, $beacon2->distanceTo, true);
@@ -376,12 +377,12 @@ class Day19 implements DayInterface
                                 'y' => $s1b2->y - $s1b1->y,
                                 'z' => $s1b2->z - $s1b1->z,
                             ];
-                            $s1distances2 = array_map(fn ($a) => $a ** 2, $s1distances);
+                            $s1absoluteDistances = array_map('abs', $s1distances);
 
                             $map = [];
 
                             foreach (['x', 'y', 'z'] as $coordinate) {
-                                $mappedCoordinate = array_search($s0distances2[$coordinate], $s1distances2, true);
+                                $mappedCoordinate = array_search($s0absoluteDistances[$coordinate], $s1absoluteDistances, true);
                                 $inversed = $s0distances[$coordinate] !== $s1distances[$mappedCoordinate];
 
                                 $scanner->coordinates->{$coordinate} = $inversed
