@@ -32,6 +32,8 @@ class Scanner
 
                 $this->beacons[$beaconIndex]->distanceTo[$beaconIndex2] = $num;
                 $this->beacons[$beaconIndex2]->distanceTo[$beaconIndex] = $num;
+                $this->beacons[$beaconIndex]->distances[$num] = true;
+                $this->beacons[$beaconIndex2]->distances[$num] = true;
             }
         }
     }

@@ -352,12 +352,12 @@ class Day19 implements DayInterface
                     $countBeacons = count($scanner->beacons);
 
                     foreach ($scanner->beacons as $beacon2) {
-                        $intersectingBeacons = array_intersect($beacon->distanceTo, $beacon2->distanceTo);
+                        $intersectingBeacons = array_intersect_key($beacon->distances, $beacon2->distances);
 
                         if (count($intersectingBeacons) >= 11) {
 
-                            $distance = current($intersectingBeacons);
-                            $secondIndex = key($intersectingBeacons);
+                            $distance = key($intersectingBeacons);
+                            $secondIndex = array_search($distance, $beacon->distanceTo, true);
 
                             $s0b1 = $beacon->coordinates;
                             $s0b2 = $scanner0->beacons[$secondIndex]->coordinates;
