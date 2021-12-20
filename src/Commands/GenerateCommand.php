@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Commands;
 
+use LogicException;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -52,8 +53,7 @@ class GenerateCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $year = $input->getOption('event');
-        $day = $input->getArgument('day');
+        [$year, $day] = $this->resolveEventDay($input);
 
         $destinationFile = sprintf('%s/Year%s/Day%s.php', $this->eventsDirectory, $year, $day);
 
@@ -96,5 +96,23 @@ class GenerateCommand extends Command
             )
         );
         return Command::SUCCESS;
+    }
+
+    private function resolveEventDay(InputInterface $input): array
+    {
+        $year = $input->getOption('event');
+        $day = $input->getArgument('day');
+
+        if ($year < 2015 || $year > (int) date('Y')) {
+            throw new LogicException(
+                sprintf('Invalid event year given. Allowed values are between 2015 and %s', date('Y'))
+            );
+        }
+
+        if ($day < 1 || $day > 25 || (!is_int($day) && !ctype_digit($day))) {
+            throw new LogicException('Invalid event day given. Allowed values are between 1 and 25');
+        }
+
+        return [(int) $year, (int) $day];
     }
 }

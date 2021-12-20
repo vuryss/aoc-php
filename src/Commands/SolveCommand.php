@@ -2,65 +2,64 @@
 
 declare(strict_types=1);
 
-namespace App;
+namespace App\Commands;
 
 use App\Event\DayInterface;
 use App\Event\EventDayRegistry;
+use App\InputResolver;
 use Exception;
+use LogicException;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
+#[AsCommand('solve', 'Solve a given day of Advent of Code.')]
 class SolveCommand extends Command
 {
-    private EventDayRegistry $eventDayRegistry;
-    private InputResolver $inputDownloader;
     private OutputInterface $output;
 
-    public function __construct(EventDayRegistry $eventDayRegistry, InputResolver $inputDownloader)
-    {
-        parent::__construct('solve');
-
-        $this->eventDayRegistry = $eventDayRegistry;
-        $this->inputDownloader = $inputDownloader;
+    public function __construct(
+        private EventDayRegistry $eventDayRegistry,
+        private InputResolver $inputDownloader
+    ) {
+        parent::__construct();
     }
 
-    protected function configure()
+    protected function configure(): void
     {
+        $currentYear = (int) date('Y');
+
         $this
-            ->setName('solve')
-            ->setDescription('Solve a given day of Advent of Code')
-            ->addArgument('day', InputArgument::REQUIRED, 'Day to solve')
-            ->addOption(
-                'event',
-                null,
-                InputOption::VALUE_REQUIRED,
-                'Which year\'s AoC to use.',
-                2021
+            ->addArgument(
+                name: 'day',
+                mode: InputArgument::OPTIONAL,
+                description: 'Day to solve',
+                default: (int) date('j'),
             )
             ->addOption(
-                'test',
-                null,
-                InputOption::VALUE_NONE,
-                'Run the tests before the final input.'
+                name: 'event',
+                mode: InputOption::VALUE_REQUIRED,
+                description: 'Which year\'s AoC to use.',
+                default: (int) date('n') === 12 ? $currentYear : $currentYear - 1,
+            )
+            ->addOption(
+                name: 'test',
+                mode: InputOption::VALUE_NONE,
+                description: 'Run the tests instead of AoC user input.'
             )
         ;
     }
 
     /**
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     *
-     * @return int
      * @throws Exception
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->output = $output;
-        $year = (int) $input->getOption('event');
-        $day = (int) $input->getArgument('day');
+        [$year, $day] = $this->resolveEventDay($input);
         $runTests = $input->getOption('test');
 
         $eventDay = $this->eventDayRegistry->getDayInYear($year, $day);
@@ -140,5 +139,23 @@ class SolveCommand extends Command
                 );
             }
         }
+    }
+
+    private function resolveEventDay(InputInterface $input): array
+    {
+        $year = $input->getOption('event');
+        $day = $input->getArgument('day');
+
+        if ($year < 2015 || $year > (int) date('Y')) {
+            throw new LogicException(
+                sprintf('Invalid event year given. Allowed values are between 2015 and %s', date('Y'))
+            );
+        }
+
+        if ($day < 1 || $day > 25 || (!is_int($day) && !ctype_digit($day))) {
+            throw new LogicException('Invalid event day given. Allowed values are between 1 and 25');
+        }
+
+        return [(int) $year, (int) $day];
     }
 }
