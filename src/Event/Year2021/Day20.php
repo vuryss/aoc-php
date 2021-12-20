@@ -77,12 +77,11 @@ class Day20 implements DayInterface
                         $binaryNumber .= ($grid[$y + $dy][$x + $dx] ?? $background) === '.' ? '0' : '1';
                     }
 
-                    $number = bindec($binaryNumber);
-                    $newChar = $pattern[$number];
-                    $newGrid[$y][$x] = $newChar;
+                    $newGrid[$y][$x] = $pattern[bindec($binaryNumber)];
                 }
             }
-            $background = $background === '.' ? $pattern[0b000000000] : $pattern[0b111111111];
+
+            $background = $background === '.' ? $pattern[0] : $pattern[511];
             $minX -= 2;
             $minY -= 2;
             $maxX += 2;
