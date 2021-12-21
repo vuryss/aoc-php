@@ -87,10 +87,10 @@ class Day21 implements DayInterface
         $this->nextPositions = $nextScores;
         $this->memory = [];
 
-        return max($this->play(0, $players[1], 0, $players[2], true));
+        return max($this->play(0, $players[1], 0, $players[2]));
     }
 
-    private function play(int $p1score, int $p1position, int $p2score, int $p2position, bool $p1turn = true): array
+    private function play(int $p1score, int $p1position, int $p2score, int $p2position): array
     {
         $hash = serialize(func_get_args());
 
@@ -109,30 +109,15 @@ class Day21 implements DayInterface
         $p1wins = 0;
         $p2wins = 0;
 
-        if ($p1turn) {
-            foreach ($this->nextPositions[$p1position] as $nextPosition => $times) {
-                [$p1winsTemp, $p2winsTemp] = $this->play(
-                    $p1score + $nextPosition,
-                    $nextPosition,
-                    $p2score,
-                    $p2position,
-                    false
-                );
-                $p1wins += $p1winsTemp * $times;
-                $p2wins += $p2winsTemp * $times;
-            }
-        } else {
-            foreach ($this->nextPositions[$p2position] as $nextPosition => $times) {
-                [$p1winsTemp, $p2winsTemp] = $this->play(
-                    $p1score,
-                    $p1position,
-                    $p2score + $nextPosition,
-                    $nextPosition,
-                    true
-                );
-                $p1wins += $p1winsTemp * $times;
-                $p2wins += $p2winsTemp * $times;
-            }
+        foreach ($this->nextPositions[$p1position] as $nextPosition => $times) {
+            [$p1winsTemp, $p2winsTemp] = $this->play(
+                $p2score,
+                $p2position,
+                $p1score + $nextPosition,
+                $nextPosition,
+            );
+            $p2wins += $p1winsTemp * $times;
+            $p1wins += $p2winsTemp * $times;
         }
 
         $this->memory[$hash] = [$p1wins, $p2wins];
