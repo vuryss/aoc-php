@@ -19,24 +19,18 @@ class Cube
 
     public function overlaps(Cube $cube): bool
     {
-        if (
-            $cube->xFrom > $this->xTo
+        return !($cube->xFrom > $this->xTo
             || $cube->xTo < $this->xFrom
             || $cube->yFrom > $this->yTo
             || $cube->yTo < $this->yFrom
             || $cube->zFrom > $this->zTo
-            || $cube->zTo < $this->zFrom
-        ) {
-            return false;
-        }
-
-        return true;
+            || $cube->zTo < $this->zFrom);
     }
 
     public function generateOverlapCube(Cube $cube): Cube
     {
         return new Cube(
-            $cube->on,
+            !$cube->on,
             max($this->xFrom, $cube->xFrom),
             min($this->xTo, $cube->xTo),
             max($this->yFrom, $cube->yFrom),
@@ -46,12 +40,8 @@ class Cube
         );
     }
 
-    public function volume(): string
+    public function volume(): int
     {
-        $x = bcadd(bcsub((string) $this->xTo, (string) $this->xFrom), '1');
-        $y = bcadd(bcsub((string) $this->yTo, (string) $this->yFrom), '1');
-        $z = bcadd(bcsub((string) $this->zTo, (string) $this->zFrom), '1');
-
-        return bcmul(bcmul($x, $y), $z);
+        return ($this->xTo - $this->xFrom + 1) * ($this->yTo - $this->yFrom + 1) * ($this->zTo - $this->zFrom + 1);
     }
 }

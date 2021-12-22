@@ -180,7 +180,6 @@ class Day22 implements DayInterface
             foreach ($resultCubes as $existingCube) {
                 if ($inputCube->overlaps($existingCube)) {
                     $extraCube = $inputCube->generateOverlapCube($existingCube);
-                    $extraCube->on = !$existingCube->on;
                     $resultCubes[] = $extraCube;
                 }
             }
@@ -190,10 +189,10 @@ class Day22 implements DayInterface
             }
         }
 
-        $counter = '0';
+        $counter = 0;
 
         foreach ($resultCubes as $resultCube) {
-            $counter = $resultCube->on ? bcadd($counter, $resultCube->volume()) : bcsub($counter, $resultCube->volume());
+            $counter += $resultCube->on ? $resultCube->volume() : -$resultCube->volume();
         }
 
         return $counter;
@@ -204,15 +203,10 @@ class Day22 implements DayInterface
      */
     private function getInputCubes(string $input): array
     {
-        $lines = explode("\n", $input);
         $inputCubes = [];
 
-        foreach ($lines as $line) {
-            preg_match('/^(on|off).*?(-?\d+).*?(-?\d+).*?(-?\d+).*?(-?\d+).*?(-?\d+).*?(-?\d+)/', $line, $matches);
-            array_shift($matches);
-            $action = array_shift($matches);
-            [$minX, $maxX, $minY, $maxY, $minZ, $maxZ] = array_map('intval', $matches);
-
+        foreach (explode("\n", $input) as $line) {
+            [$action, $minX, $maxX, $minY, $maxY, $minZ, $maxZ] = sscanf($line, '%s x=%d..%d,y=%d..%d,z=%d..%d');
             $inputCubes[] = new Cube($action === 'on', $minX, $maxX, $minY, $maxY, $minZ, $maxZ);
         }
 
