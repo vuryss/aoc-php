@@ -6,7 +6,6 @@ namespace App\Event\Year2021;
 
 use App\Event\DayInterface;
 use App\Event\Year2021\Helpers\Cube;
-use LogicException;
 
 class Day22 implements DayInterface
 {
@@ -149,8 +148,8 @@ class Day22 implements DayInterface
 
         foreach ($inputCubes as $cube) {
             for ($x = max($cube->xFrom, -50); $x <= min($cube->xTo, 50); $x++) {
-                for ($y = $cube->yFrom; $y <= $cube->yTo; $y++) {
-                    for ($z = $cube->zFrom; $z <= $cube->zTo; $z++) {
+                for ($y = max($cube->yFrom, -50); $y <= min($cube->yTo, 50); $y++) {
+                    for ($z = max($cube->zFrom, -50); $z <= min($cube->zTo, 50); $z++) {
                         $grid[$x][$y][$z] = $cube->on;
                     }
                 }
@@ -174,27 +173,27 @@ class Day22 implements DayInterface
     {
         $inputCubes = $this->getInputCubes($input);
 
-        /** @var Cube[] $cubes */
-        $cubes = [];
+        /** @var Cube[] $resultCubes */
+        $resultCubes = [];
 
-        foreach ($inputCubes as $cube) {
-            foreach ($cubes as $existingCube) {
-                if ($cube->overlaps($existingCube)) {
-                    $exCube = $cube->getOverlapCube($existingCube);
-                    $exCube->on = !$existingCube->on;
-                    $cubes[] = $exCube;
+        foreach ($inputCubes as $inputCube) {
+            foreach ($resultCubes as $existingCube) {
+                if ($inputCube->overlaps($existingCube)) {
+                    $extraCube = $inputCube->generateOverlapCube($existingCube);
+                    $extraCube->on = !$existingCube->on;
+                    $resultCubes[] = $extraCube;
                 }
             }
 
-            if ($cube->on) {
-                $cubes[] = $cube;
+            if ($inputCube->on) {
+                $resultCubes[] = $inputCube;
             }
         }
 
         $counter = '0';
 
-        foreach ($cubes as $cube) {
-            $counter = $cube->on ? bcadd($counter, $cube->volume()) : bcsub($counter, $cube->volume());
+        foreach ($resultCubes as $resultCube) {
+            $counter = $resultCube->on ? bcadd($counter, $resultCube->volume()) : bcsub($counter, $resultCube->volume());
         }
 
         return $counter;

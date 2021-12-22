@@ -23,7 +23,7 @@ class Cube
             $cube->xFrom > $this->xTo
             || $cube->xTo < $this->xFrom
             || $cube->yFrom > $this->yTo
-            || $cube->yTo < $this->xFrom
+            || $cube->yTo < $this->yFrom
             || $cube->zFrom > $this->zTo
             || $cube->zTo < $this->zFrom
         ) {
@@ -33,7 +33,7 @@ class Cube
         return true;
     }
 
-    public function getOverlapCube(Cube $cube): Cube
+    public function generateOverlapCube(Cube $cube): Cube
     {
         return new Cube(
             $cube->on,
