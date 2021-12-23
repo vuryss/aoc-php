@@ -11,4 +11,9 @@ class Point2
         public int $y,
     ) {
     }
+
+    public function equals(Point2 $point): bool
+    {
+        return $point->x === $this->x && $point->y === $this->y;
+    }
 }
