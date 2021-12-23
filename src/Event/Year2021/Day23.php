@@ -20,13 +20,6 @@ class Day23 implements DayInterface
         [0, 1],
     ];
 
-    private const COST = [
-        'A' => 1,
-        'B' => 10,
-        'C' => 100,
-        'D' => 1000,
-    ];
-
     private Burrow $burrow;
 
     public function testPart1(): iterable
@@ -97,12 +90,12 @@ class Day23 implements DayInterface
 
         $storedAmphipodStates = [];
 
-        $queue = new PriorityQueue();
-        $queue->push([0, $amphipodPositions, []], 0);
+        $amphipodPositionsByCost = new PriorityQueue();
+        $amphipodPositionsByCost->push([0, $amphipodPositions], 0);
 
-        while (!$queue->isEmpty()) {
+        while (!$amphipodPositionsByCost->isEmpty()) {
             /** @noinspection PhpUndefinedMethodInspection */
-            [$cost, $ampPositions] = $queue->pop();
+            [$cost, $ampPositions] = $amphipodPositionsByCost->pop();
 
             ksort($ampPositions);
             $hash = serialize($ampPositions);
@@ -126,12 +119,11 @@ class Day23 implements DayInterface
 
                     $point = new Point2($x, $y);
                     $isLocked = $point->y === 1;
-                    $ampMovement = new Queue();
-                    $ampMovement->push([$ampType, $point, $cost, $ampPositions]);
+                    $amphipodMovement = new Queue([[$ampType, $point, $cost, $ampPositions]]);
                     $visited = [];
 
-                    while (!$ampMovement->isEmpty()) {
-                        [$ampType2, $position2, $cost2, $ampPositions2] = $ampMovement->pop();
+                    while (!$amphipodMovement->isEmpty()) {
+                        [$ampType2, $position2, $cost2, $ampPositions2] = $amphipodMovement->pop();
                         $visited[$position2->x][$position2->y] = true;
 
                         foreach (self::DELTAS as [$dx, $dy]) {
@@ -159,19 +151,19 @@ class Day23 implements DayInterface
                                 }
                             }
 
-                            $newCost = $cost2 + self::COST[$ampType];
+                            $newCost = $cost2 + Amphipod::MOVE_COST[$ampType];
                             $newAmpPositions = $ampPositions2;
                             unset($newAmpPositions[$position2->y][$position2->x]);
                             $newAmpPositions[$newPoint->y][$newPoint->x] = ['type' => $ampType2, 'inPlace' => $isNewPointRoom];
 
-                            $ampMovement->push([$ampType2, $newPoint, $newCost, $newAmpPositions]);
+                            $amphipodMovement->push([$ampType2, $newPoint, $newCost, $newAmpPositions]);
 
                             // Check if the new position is valid placement of amphipod after a move
                             if ($point->x !== $newPoint->x && !$this->burrow->isForbidden($newPoint)) {
                                 if (!$isLocked || $isNewPointRoom) {
                                     if (!$isNewPointRoom || !$this->hasEmptySpaceBelow($ampPositions, $newPoint, $maxLevel)) {
                                         ksort($newAmpPositions[$newPoint->y]);
-                                        $queue->push([$newCost, $newAmpPositions], -$newCost);
+                                        $amphipodPositionsByCost->push([$newCost, $newAmpPositions], -$newCost);
                                     }
                                 }
                             }

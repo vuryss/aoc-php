@@ -18,9 +18,10 @@ class Amphipod
         self::TYPE_D => self::TYPE_D,
     ];
 
-    public bool $inPosition = false;
-
-    public function __construct(public string $type)
-    {
-    }
+    public const MOVE_COST = [
+        self::TYPE_A => 1,
+        self::TYPE_B => 10,
+        self::TYPE_C => 100,
+        self::TYPE_D => 1000,
+    ];
 }
