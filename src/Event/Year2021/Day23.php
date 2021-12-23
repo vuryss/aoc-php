@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Event\Year2021;
 
 use App\Event\DayInterface;
+use App\Event\Year2021\Helpers\Amphipod;
 use App\Event\Year2021\Helpers\Burrow;
 use App\Event\Year2021\Helpers\Point2;
 use Ds\PriorityQueue;
@@ -71,32 +72,33 @@ class Day23 implements DayInterface
     {
         $this->burrow = new Burrow($maxLevel);
 
-        $grid = [];
-        $amps = [];
-        $memory = [];
+        $availablePositions = [];
+        $amphipodPositions = [];
 
         foreach ($lines as $y => $line) {
-            $chars = str_split($line);
-
-            foreach ($chars as $x => $char) {
+            foreach (str_split($line) as $x => $char) {
                 if ($char === '.') {
-                    $grid[$y][$x] = true;
-                    continue;
-                }
-
-                if (in_array($char, ['A', 'B', 'C', 'D'])) {
-                    $grid[$y][$x] = true;
-                    $amps[$y][$x] = $char;
+                    $availablePositions[$y][$x] = true;
+                } elseif (isset(Amphipod::TYPES[$char])) {
+                    $availablePositions[$y][$x] = true;
+                    $amphipodPositions[$y][$x] = ['type' => $char];
                 }
             }
         }
 
-        foreach ($amps as $key => $amp) {
-            ksort($amps[$key]);
+        foreach ($amphipodPositions as $y => $line) {
+            foreach ($line as $x => ['type' => $type]) {
+                $amphipodPositions[$y][$x] = [
+                    'type' => $type,
+                    'inPlace' => $this->isInPlace(new Point2($x, $y), $type, $amphipodPositions, $maxLevel)
+                ];
+            }
         }
 
+        $storedAmphipodStates = [];
+
         $queue = new PriorityQueue();
-        $queue->push([0, $amps, []], 0);
+        $queue->push([0, $amphipodPositions, []], 0);
 
         while (!$queue->isEmpty()) {
             /** @noinspection PhpUndefinedMethodInspection */
@@ -105,54 +107,53 @@ class Day23 implements DayInterface
             ksort($ampPositions);
             $hash = serialize($ampPositions);
 
-            if (isset($memory[$hash])) {
+            if (isset($storedAmphipodStates[$hash])) {
                 continue;
             }
 
-            $memory[$hash] = true;
+            $storedAmphipodStates[$hash] = true;
 
             if ($this->isSolved($ampPositions)) {
                 return $cost;
             }
 
-            foreach ($ampPositions as $y => $xAmpPositions) {
-                foreach ($xAmpPositions as $x => $ampType) {
-                    $point = new Point2($x, $y);
-
+            foreach ($ampPositions as $y => $line) {
+                foreach ($line as $x => ['type' => $ampType, 'inPlace' => $inPlace]) {
                     // Amp is in place - do not move
-                    if ($this->isInPlace($point, $ampType, $ampPositions, $maxLevel)) {
+                    if ($inPlace) {
                         continue;
                     }
 
+                    $point = new Point2($x, $y);
                     $isLocked = $point->y === 1;
-                    $tempQueue = new Queue();
-                    $tempQueue->push([$ampType, $point, $cost, $ampPositions]);
+                    $ampMovement = new Queue();
+                    $ampMovement->push([$ampType, $point, $cost, $ampPositions]);
                     $visited = [];
 
-                    while (!$tempQueue->isEmpty()) {
-                        [$ampType2, $position2, $cost2, $ampPositions2] = $tempQueue->pop();
+                    while (!$ampMovement->isEmpty()) {
+                        [$ampType2, $position2, $cost2, $ampPositions2] = $ampMovement->pop();
                         $visited[$position2->x][$position2->y] = true;
 
                         foreach (self::DELTAS as [$dx, $dy]) {
                             $newPoint = new Point2($position2->x + $dx, $position2->y + $dy);
 
                             if (
-                                !isset($grid[$newPoint->y][$newPoint->x])
+                                !isset($availablePositions[$newPoint->y][$newPoint->x])
                                 || isset($visited[$newPoint->x][$newPoint->y])
                                 || isset($ampPositions[$newPoint->y][$newPoint->x])
                             ) {
                                 continue;
                             }
 
-                            $isRoom = $newPoint->y > 1;
+                            $isNewPointRoom = $newPoint->y > 1;
 
-                            if ($isRoom && $newPoint->x !== $point->x) {
+                            if ($isNewPointRoom && $newPoint->x !== $point->x) {
                                 if (!$this->burrow->isAmphipodTypeRoom($ampType2, $newPoint)) {
                                     continue;
                                 }
 
                                 foreach ($this->burrow->getAmphipodTypeRooms($ampType2) as $roomPosition) {
-                                    if (($ampPositions2[$roomPosition->y][$roomPosition->x] ?? $ampType2) !== $ampType2) {
+                                    if (($ampPositions2[$roomPosition->y][$roomPosition->x]['type'] ?? $ampType2) !== $ampType2) {
                                         continue 2;
                                     }
                                 }
@@ -161,27 +162,16 @@ class Day23 implements DayInterface
                             $newCost = $cost2 + self::COST[$ampType];
                             $newAmpPositions = $ampPositions2;
                             unset($newAmpPositions[$position2->y][$position2->x]);
-                            $newAmpPositions[$newPoint->y][$newPoint->x] = $ampType2;
+                            $newAmpPositions[$newPoint->y][$newPoint->x] = ['type' => $ampType2, 'inPlace' => $isNewPointRoom];
 
-                            $tempQueue->push([$ampType2, $newPoint, $newCost, $newAmpPositions]);
+                            $ampMovement->push([$ampType2, $newPoint, $newCost, $newAmpPositions]);
 
-                            // Check if the spot is allowed
-                            if (!$this->burrow->isForbidden($newPoint)) {
-                                if (!$isLocked || $isRoom) {
-                                    if ($point->x !== $newPoint->x) {
-                                        $hasEmptyBelow = false;
-
-                                        for ($nextY = $newPoint->y + 1; $nextY <= $maxLevel; $nextY++) {
-                                            if (!isset($ampPositions[$nextY][$newPoint->x])) {
-                                                $hasEmptyBelow = true;
-                                                break;
-                                            }
-                                        }
-
-                                        if (!$isRoom || !$hasEmptyBelow) {
-                                            ksort($newAmpPositions[$newPoint->y]);
-                                            $queue->push([$newCost, $newAmpPositions], -$newCost);
-                                        }
+                            // Check if the new position is valid placement of amphipod after a move
+                            if ($point->x !== $newPoint->x && !$this->burrow->isForbidden($newPoint)) {
+                                if (!$isLocked || $isNewPointRoom) {
+                                    if (!$isNewPointRoom || !$this->hasEmptySpaceBelow($ampPositions, $newPoint, $maxLevel)) {
+                                        ksort($newAmpPositions[$newPoint->y]);
+                                        $queue->push([$newCost, $newAmpPositions], -$newCost);
                                     }
                                 }
                             }
@@ -194,10 +184,21 @@ class Day23 implements DayInterface
         return 'error';
     }
 
+    private function hasEmptySpaceBelow(array $ampPositions, Point2 $point, int $maxLevel): bool
+    {
+        for ($y = $point->y + 1; $y <= $maxLevel; $y++) {
+            if (!isset($ampPositions[$y][$point->x])) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     private function isSolved(array $ampPositions): bool
     {
         foreach ($ampPositions as $y => $xPosition) {
-            foreach ($xPosition as $x => $ampType) {
+            foreach ($xPosition as $x => ['type' => $ampType]) {
                 if (!$this->burrow->isAmphipodTypeRoom($ampType, new Point2($x, $y))) {
                     return false;
                 }
@@ -214,7 +215,7 @@ class Day23 implements DayInterface
         }
 
         for ($y = $point->y + 1; $y <= $maxLevel; $y++) {
-            if (!isset($ampPositions[$y][$point->x]) || $ampPositions[$y][$point->x] !== $ampType) {
+            if (!isset($ampPositions[$y][$point->x]) || $ampPositions[$y][$point->x]['type'] !== $ampType) {
                 return false;
             }
         }
