@@ -24,3 +24,7 @@ services:
     App\InputResolver:
         arguments:
             $sessionToken: '%env(AOC_SESSION_TOKEN)%'
+
+    App\AnswerResolver:
+        arguments:
+            $sessionToken: '%env(AOC_SESSION_TOKEN)%'

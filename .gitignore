@@ -1,6 +1,8 @@
 /.idea
 /inputs/**
 !/inputs/.gitkeep
+/answers/**
+!/answers/.gitkeep
 
 ###> symfony/framework-bundle ###
 /.env.local

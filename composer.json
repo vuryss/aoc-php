@@ -14,7 +14,9 @@
         "symfony/runtime": "7.1.*",
         "symfony/twig-bundle": "7.1.*",
         "twig/extra-bundle": "^3.13",
-        "twig/twig": "^3.14"
+        "twig/twig": "^3.14",
+        "symfony/dom-crawler": "7.1.*",
+        "symfony/css-selector": "7.1.*"
     },
     "autoload": {
         "psr-4": {
