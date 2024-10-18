@@ -97,11 +97,12 @@ class SolveCommand extends Command
         $table = new Table($this->output->section());
         $table->addRow([new TableCell('Day ' . $puzzleId->day, ['colspan' => 3, 'style' => new TableCellStyle(['align' => 'center'])])]);
         $table->addRow(new TableSeparator());
-        $table->render();
 
         $this->runTests($eventDay->testPart1(), fn ($input) => (string) $eventDay->solvePart1($input), $table, 'Part 1');
         $table->addRow(new TableSeparator());
         $this->runTests($eventDay->testPart2(), fn ($input) => (string) $eventDay->solvePart2($input), $table, 'Part 2');
+
+        $table->render();
     }
 
     private function runTests(iterable $tests, callable $solveFn, Table $table, string $part): void
@@ -112,9 +113,9 @@ class SolveCommand extends Command
             $actualResult = $solveFn($testInput);
 
             if ($expectedResult === $actualResult) {
-                $table->appendRow([$part, 'Test ' . $testNumber, '<info>Success</info>']);
+                $table->addRow([$part, 'Test ' . $testNumber, '<info>Success</info>']);
             } else {
-                $table->appendRow([
+                $table->addRow([
                     $part,
                     'Test ' . $testNumber,
                     '<error>Expected: ' . $expectedResult . ' Received: ' . $actualResult . '</error>'
@@ -160,17 +161,18 @@ class SolveCommand extends Command
         $table = new Table($this->output->section());
         $table->addRow([new TableCell('Day ' . $puzzleId->day, ['colspan' => 3, 'style' => new TableCellStyle(['align' => 'center'])])]);
         $table->addRow(new TableSeparator());
-        $table->render();
 
         $start = microtime(true);
         $part1Result = (string) $eventDay->solvePart1($dayInput);
         $part1ExecutionTime = microtime(true) - $start;
 
-        $table->appendRow(['Part 1', str_pad($part1Result, 100, ' '), number_format($part1ExecutionTime, 5, '.', '').'s']);
+        $table->addRow(['Part 1', str_pad($part1Result, 100, ' '), number_format($part1ExecutionTime, 5, '.', '').'s']);
 
         $part2Result = (string) $eventDay->solvePart2($dayInput);
         $part2ExecutionTime = microtime(true) - $start - $part1ExecutionTime;
 
-        $table->appendRow(['Part 2', str_pad($part2Result, 100, ' '), number_format($part2ExecutionTime, 5, '.', '').'s']);
+        $table->addRow(['Part 2', str_pad($part2Result, 100, ' '), number_format($part2ExecutionTime, 5, '.', '').'s']);
+
+        $table->render();
     }
 }

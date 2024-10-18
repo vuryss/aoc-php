@@ -77,6 +77,10 @@ class GenerateCommand extends Command
             ]
         );
 
+        if (!is_dir(dirname($destinationFile))) {
+            mkdir(dirname($destinationFile), 0777, true);
+        }
+
         $bytesWritten = file_put_contents(
             $destinationFile,
             $wrapperClassCode
