@@ -314,7 +314,7 @@ class Day19 implements DayInterface
                     + abs($scanner->coordinates->y - $scanner2->coordinates->y)
                     + abs($scanner->coordinates->z - $scanner2->coordinates->z);
 
-                $max = max($max, $dist);
+                $max = (int) max($max, $dist);
             }
         }
 
@@ -383,6 +383,7 @@ class Day19 implements DayInterface
 
                             foreach (['x', 'y', 'z'] as $coordinate) {
                                 $mappedCoordinate = array_search($s0absoluteDistances[$coordinate], $s1absoluteDistances, true);
+                                assert(false !== $mappedCoordinate);
                                 $inversed = $s0distances[$coordinate] !== $s1distances[$mappedCoordinate];
 
                                 $scanner->coordinates->{$coordinate} = $inversed

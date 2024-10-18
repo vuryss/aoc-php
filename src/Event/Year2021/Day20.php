@@ -8,7 +8,7 @@ use App\Event\DayInterface;
 
 class Day20 implements DayInterface
 {
-    private const DELTAS = [
+    private const array DELTAS = [
         [-1, -1],
         [-1, 0],
         [-1, 1],
@@ -74,14 +74,14 @@ class Day20 implements DayInterface
                     $binaryNumber = '';
 
                     foreach (self::DELTAS as [$dy, $dx]) {
-                        $binaryNumber .= ($grid[$y + $dy][$x + $dx] ?? $background) === '.' ? '0' : '1';
+                        $binaryNumber .= '.' === ($grid[$y + $dy][$x + $dx] ?? $background) ? '0' : '1';
                     }
 
-                    $newGrid[$y][$x] = $pattern[bindec($binaryNumber)];
+                    $newGrid[$y][$x] = $pattern[(int) bindec($binaryNumber)];
                 }
             }
 
-            $background = $background === '.' ? $pattern[0] : $pattern[511];
+            $background = '.' === $background ? $pattern[0] : $pattern[511];
             $minX -= 2;
             $minY -= 2;
             $maxX += 2;
@@ -93,7 +93,7 @@ class Day20 implements DayInterface
 
         for ($y = $minY; $y <= $maxY; $y++) {
             for ($x = $minX; $x <= $maxX; $x++) {
-                if (($grid[$y][$x] ?? $background) === '#') {
+                if ('#' === ($grid[$y][$x] ?? $background)) {
                     $count++;
                 }
             }

@@ -59,7 +59,7 @@ class Day18 implements DayInterface
         while (true) {
             if (!isset($left)) {
                 if (ctype_digit($equation[0])) {
-                    $left = $equation[0];
+                    $left = (int) $equation[0];
                 } else {
                     $equation = trim(substr($equation, 1));
                     $left = $this->solveBasic($equation);
@@ -71,24 +71,23 @@ class Day18 implements DayInterface
             $sign = $equation[0];
 
             $equation = trim(substr($equation, 1));
-            $right = null;
 
             if (ctype_digit($equation[0])) {
-                $right = $equation[0];
+                $right = (int) $equation[0];
             } else {
                 $equation = trim(substr($equation, 1));
                 $right = $this->solveBasic($equation);
             }
 
-            if ($sign === '+') {
+            if ('+' === $sign) {
                 $left += $right;
-            } elseif ($sign === '*') {
+            } elseif ('*' === $sign) {
                 $left *= $right;
             }
 
             $equation = trim(substr($equation, 1));
 
-            if (empty($equation) || $equation[0] === ')') {
+            if (empty($equation) || ')' === $equation[0]) {
                 return $left;
             }
         }
@@ -101,7 +100,7 @@ class Day18 implements DayInterface
             $i = 0;
 
             while (true) {
-                if (!isset($equation[$i]) || $equation[$i] === ')') {
+                if (!isset($equation[$i]) || ')' === $equation[$i]) {
                     break;
                 }
 
@@ -122,9 +121,9 @@ class Day18 implements DayInterface
                     continue;
                 }
 
-                if ($sign === '+') {
+                if ('+' === $sign) {
                     $left += $right;
-                } elseif ($sign === '*') {
+                } elseif ('*' === $sign) {
                     $left *= $right;
                 }
 
@@ -135,7 +134,7 @@ class Day18 implements DayInterface
                 $i = $startOperation + 1;
             }
 
-            if (count($equation) === 1) break;
+            if (1 === count($equation)) break;
         }
 
         return $equation[0];
@@ -165,9 +164,9 @@ class Day18 implements DayInterface
         while ($depth > 0) {
             $char = $equation[$checkPosition++];
 
-            if ($char === '(') {
+            if ('(' === $char) {
                 $depth++;
-            } elseif ($char === ')') {
+            } elseif (')' === $char) {
                 $depth--;
             }
         }

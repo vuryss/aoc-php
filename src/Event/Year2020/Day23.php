@@ -37,7 +37,7 @@ class Day23 implements DayInterface
         do {
             $result .= $current;
             $current = $cups[$current];
-        } while ($current !== 1);
+        } while (1 !== $current);
 
         return $result;
     }
@@ -72,6 +72,7 @@ class Day23 implements DayInterface
         }
 
         if ($upToMillion) {
+            assert(null !== $lastAddedCup);
             for ($i = $this->highestCupLabel + 1; $i <= 1000000; $i++) {
                 $cups[$lastAddedCup] = $i;
                 $lastAddedCup = $i;
@@ -80,7 +81,7 @@ class Day23 implements DayInterface
             $this->highestCupLabel = 1000000;
         }
 
-        $cups[$lastAddedCup] = array_key_first($cups);
+        $cups[(int) $lastAddedCup] = (int) array_key_first($cups);
 
         return $cups;
     }

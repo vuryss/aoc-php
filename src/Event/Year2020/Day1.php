@@ -35,6 +35,7 @@ class Day1 implements DayInterface
 
     public function solvePart1(string $input): string
     {
+        /** @var list<int> $list */
         $list = explode("\n", $input);
         $map = array_fill_keys($list, true);
 
@@ -49,6 +50,7 @@ class Day1 implements DayInterface
 
     public function solvePart2(string $input): string
     {
+        /** @var list<int> $list */
         $list = explode("\n", $input);
         $count = count($list);
         $map = array_fill_keys($list, true);

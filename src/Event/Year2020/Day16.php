@@ -40,7 +40,7 @@ class Day16 implements DayInterface
             foreach ($nearbyTicket as $value) {
                 $matchingFields = $this->getWhichFieldsMatchValue($data['rules'], $value);
 
-                if (count($matchingFields) === 0) {
+                if (0 === count($matchingFields)) {
                     $invalid[] = $value;
                 }
             }
@@ -57,7 +57,7 @@ class Day16 implements DayInterface
             foreach ($nearbyTicket as $value) {
                 $matchingFields = $this->getWhichFieldsMatchValue($data['rules'], $value);
 
-                if (count($matchingFields) === 0) {
+                if (0 === count($matchingFields)) {
                     unset($data['nearbyTickets'][$ticketIndex]);
                     break;
                 }
@@ -78,11 +78,11 @@ class Day16 implements DayInterface
 
             $matchedFieldTypes = array_intersect(...$matching);
 
-            if (count($matchedFieldTypes) === 1) {
+            if (1 === count($matchedFieldTypes)) {
                 $typeMap[$index] = current($matchedFieldTypes);
                 unset($data['rules'][$typeMap[$index]]);
 
-                if (count($data['rules']) === 0) {
+                if (0 === count($data['rules'])) {
                     break;
                 }
             }
@@ -97,7 +97,7 @@ class Day16 implements DayInterface
         $product = [];
 
         foreach ($typeMap as $index => $value) {
-            if (strpos($value, 'departure') !== false) {
+            if (str_contains($value, 'departure')) {
                 $product[] = $data['myTicket'][$index];
             }
         }
@@ -106,7 +106,7 @@ class Day16 implements DayInterface
     }
 
     /**
-     * @param array<string, array<string, int>> $rules
+     * @param array<string, list<array{min: int, max: int}>> $rules
      * @param int $value
      *
      * @return string[]
@@ -127,6 +127,14 @@ class Day16 implements DayInterface
         return $matching;
     }
 
+    /**
+     * @param string $input
+     * @return array{
+     *     rules: array<string, list<array{min: int, max: int}>>,
+     *     myTicket: list<int>,
+     *     nearbyTickets: list<list<int>>
+     * }
+     */
     private function parseInput(string $input): array
     {
         [$ruleList, $myTicketData, $nearbyTicketsData] = explode("\n\n", $input);
@@ -138,7 +146,7 @@ class Day16 implements DayInterface
             preg_match_all('/(\d+)-(\d+)/', $ruleItem, $matches);
 
             foreach (array_keys($matches[0]) as $index) {
-                $rules[$name][] = ['min' => $matches[1][$index], 'max' => $matches[2][$index]];
+                $rules[$name][] = ['min' => (int) $matches[1][$index], 'max' => (int) $matches[2][$index]];
             }
         }
 
@@ -148,14 +156,10 @@ class Day16 implements DayInterface
         array_shift($nearbyTicketsData);
 
         $nearbyTickets = array_map(
-            fn ($line) => array_map('intval', explode(',', $line)),
+            static fn ($line) => array_map('intval', explode(',', $line)),
             $nearbyTicketsData
         );
 
-        return [
-            'rules' => $rules,
-            'myTicket' => $myTicket,
-            'nearbyTickets' => $nearbyTickets,
-        ];
+        return compact('rules', 'myTicket', 'nearbyTickets');
     }
 }

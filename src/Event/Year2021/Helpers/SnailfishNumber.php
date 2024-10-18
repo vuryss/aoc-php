@@ -15,7 +15,7 @@ class SnailfishNumber
     ) {
         $this->parse($number);
 
-        if ($this->level === 0) {
+        if (0 === $this->level) {
             $this->reduce();
         }
     }
@@ -26,11 +26,11 @@ class SnailfishNumber
         $depth = 0;
 
         for ($i = 0, $len = strlen($number); $i < $len; $i++) {
-            if ($number[$i] === '[') {
+            if ('[' === $number[$i]) {
                 $depth++;
-            } elseif ($number[$i] === ']') {
+            } elseif (']' === $number[$i]) {
                 $depth--;
-            } elseif ($number[$i] === ',' && $depth === 0) {
+            } elseif (',' === $number[$i] && 0 === $depth) {
                 break;
             }
         }
@@ -75,7 +75,7 @@ class SnailfishNumber
     {
         // If we have to carry the right number, it should be set to the leftmost node
         // (closest to the right of exploded node)
-        if ($carryRight !== null) {
+        if (null !== $carryRight) {
             if ($this->leftSide instanceof self) {
                 $this->leftSide->explode($carryLeft, $carryRight);
             } else {
@@ -88,7 +88,7 @@ class SnailfishNumber
 
         // If we carry the left number, it should be set to the rightmost node
         // (closest to the left to exploded node)
-        if ($carryLeft !== null) {
+        if (null !== $carryLeft) {
             if ($this->rightSide instanceof self) {
                 $this->rightSide->explode($carryLeft, $carryRight);
             } else {
@@ -100,16 +100,16 @@ class SnailfishNumber
         }
 
         if ($this->leftSide instanceof self) {
-            if ($this->leftSide->level === 4) {
-                $carryLeft = (int) $this->leftSide->leftSide;
-                $carryRight = (int) $this->leftSide->rightSide;
+            if (4 === $this->leftSide->level) {
+                $carryLeft = is_int($this->leftSide->leftSide) ? $this->leftSide->leftSide : 0;
+                $carryRight = is_int($this->leftSide->rightSide) ? $this->leftSide->rightSide : 0;
                 $this->leftSide = 0;
                 $hasExploded = true;
             } else {
                 $hasExploded = $this->leftSide->explode($carryLeft, $carryRight);
             }
 
-            if ($carryRight !== null) {
+            if (null !== $carryRight) {
                 if ($this->rightSide instanceof self) {
                     $this->rightSide->explode($carryLeft, $carryRight);
                 } else {
@@ -125,16 +125,16 @@ class SnailfishNumber
         }
 
         if ($this->rightSide instanceof self) {
-            if ($this->rightSide->level === 4) {
-                $carryLeft = (int) $this->rightSide->leftSide;
-                $carryRight = (int) $this->rightSide->rightSide;
+            if (4 === $this->rightSide->level) {
+                $carryLeft = is_int($this->rightSide->leftSide) ? $this->rightSide->leftSide : 0;
+                $carryRight = is_int($this->rightSide->rightSide) ? $this->rightSide->rightSide : 0;
                 $this->rightSide = 0;
                 $hasExploded = true;
             } else {
                 $hasExploded = $this->rightSide->explode($carryLeft, $carryRight);
             }
 
-            if ($carryLeft !== null) {
+            if (null !== $carryLeft) {
                 if ($this->leftSide instanceof self) {
                     $this->leftSide->explode($carryLeft, $carryRight);
                 } else {

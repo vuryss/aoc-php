@@ -79,7 +79,7 @@ class Day4 implements DayInterface
             foreach ($boards as $boardIndex => &$board) {
                 $matchIndex = array_search($number, $board, true);
 
-                if ($matchIndex === false) {
+                if (false === $matchIndex) {
                     continue;
                 }
 
@@ -91,8 +91,8 @@ class Day4 implements DayInterface
 
                 $board[$matchIndex] = null;
 
-                if ($columnMarks[$boardIndex][$col] === 5 || $rowMarks[$boardIndex][$row] === 5) {
-                    $results[$boardIndex] = array_sum($board) * $number;
+                if (5 === $columnMarks[$boardIndex][$col] || 5 === $rowMarks[$boardIndex][$row]) {
+                    $results[$boardIndex] = (int) array_sum($board) * $number;
                     unset($boards[$boardIndex]);
                 }
             }

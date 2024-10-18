@@ -85,6 +85,6 @@ class Day18 implements DayInterface
             }
         }
 
-        return $max;
+        return (string) $max;
     }
 }

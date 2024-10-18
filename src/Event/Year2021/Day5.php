@@ -77,7 +77,7 @@ class Day5 implements DayInterface
 
         foreach ($grid as $line) {
             foreach ($line as $vents) {
-                $count += $vents > 1;
+                $count += ($vents > 1) ? 1 : 0;
             }
         }
 

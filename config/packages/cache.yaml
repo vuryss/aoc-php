@@ -1,5 +1,0 @@
-framework:
-    cache:
-        pools:
-            aoc_input:
-                adapter: cache.adapter.filesystem

@@ -36,8 +36,8 @@ class Day14 implements DayInterface
         $mask = [];
 
         foreach ($lines as $line) {
-            if (preg_match('/mask\s=\s([X01]+)/', $line, $matches) === 1) {
-                $mask = array_filter(str_split($matches[1]), fn (string $char) => $char !== 'X');
+            if (1 === preg_match('/mask\s=\s([X01]+)/', $line, $matches)) {
+                $mask = array_filter(str_split($matches[1]), static fn (string $char) => 'X' !== $char);
                 continue;
             }
 
@@ -63,7 +63,7 @@ class Day14 implements DayInterface
         $mask = [];
 
         foreach ($lines as $line) {
-            if (preg_match('/mask\s=\s([X01]+)/', $line, $matches) === 1) {
+            if (1 === preg_match('/mask\s=\s([X01]+)/', $line, $matches)) {
                 $mask = str_split($matches[1]);
                 continue;
             }
@@ -73,7 +73,7 @@ class Day14 implements DayInterface
             $address = str_pad(decbin((int) $address), 36, '0', STR_PAD_LEFT);
 
             foreach ($mask as $index => $replacement) {
-                if ($replacement === '1') {
+                if ('1' === $replacement) {
                     $address[$index] = '1';
                 }
             }
@@ -81,7 +81,7 @@ class Day14 implements DayInterface
             $allAddresses = [$address];
 
             foreach ($mask as $index => $replacement) {
-                if ($replacement === 'X') {
+                if ('X' === $replacement) {
                     $current = $allAddresses;
                     $allAddresses = [];
 
@@ -95,7 +95,7 @@ class Day14 implements DayInterface
             }
 
             foreach ($allAddresses as $address) {
-                $memory[bindec($address)] = $value;
+                $memory[(int) bindec($address)] = (int) $value;
             }
         }
 

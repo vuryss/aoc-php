@@ -10,7 +10,7 @@ use SplQueue;
 
 class Day7 implements DayInterface
 {
-    const OUR_BAG = 'shiny gold';
+    const string OUR_BAG = 'shiny gold';
 
     public function testPart1(): iterable
     {
@@ -118,7 +118,7 @@ class Day7 implements DayInterface
                 preg_match_all('/(\d+)\s(\w+\s+\w+)\sbag/', $rules, $matches);
 
                 foreach ($matches[1] as $key => $value) {
-                    $bag->contains[$matches[2][$key]] = $value;
+                    $bag->contains[$matches[2][$key]] = (int) $value;
                 }
             }
 

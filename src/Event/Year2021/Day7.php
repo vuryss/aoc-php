@@ -27,7 +27,9 @@ class Day7 implements DayInterface
         $positions = array_map('intval', explode(',', $input));
         $fuel = PHP_INT_MAX;
 
-        for ($i = min($positions), $max = max($positions), $sum = 0; $i <= $max; $i++) {
+        for ($i = min($positions), $max = max($positions); $i <= $max; $i++) {
+            $sum = 0;
+
             foreach ($positions as $position) {
                 $sum += abs($position - $i);
             }
@@ -43,7 +45,9 @@ class Day7 implements DayInterface
         $positions = array_map('intval', explode(',', $input));
         $fuel = PHP_INT_MAX;
 
-        for ($i = min($positions), $max = max($positions), $sum = 0; $i <= $max; $i++) {
+        for ($i = min($positions), $max = max($positions); $i <= $max; $i++) {
+            $sum = 0;
+
             foreach ($positions as $position) {
                 $steps = abs($position - $i);
                 $sum += $steps * ($steps + 1) / 2;

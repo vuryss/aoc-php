@@ -66,7 +66,7 @@ class Day13 implements DayInterface
     {
         $grid = $this->foldPaper($input);
 
-        $count = array_reduce($grid, fn ($carry, $value) => $carry + count($value), 0);
+        $count = array_reduce($grid, static fn ($carry, $value) => $carry + count($value), 0);
 
         return (string) $count;
     }
@@ -85,19 +85,23 @@ class Day13 implements DayInterface
         return '';
     }
 
+    /**
+     * @return array<int, array<int, string>>
+     */
     private function foldPaper(string $input, bool $onlyFirst = true): array
     {
         [$coordinates, $folds] = explode("\n\n", $input);
+        /** @var array<int, array<int, string>> $grid */
         $grid = [];
 
         foreach (explode("\n", $coordinates) as $coords) {
             [$x, $y] = sscanf($coords, '%d,%d');
-            $grid[$y][$x] = '#';
+            $grid[(int) $y][(int) $x] = '#';
         }
 
         foreach (explode("\n", $folds) as $fold) {
             [, , $fold, $amount] = sscanf($fold, '%s %s %[^=]=%d');
-            $grid = $fold === 'y' ? $this->foldY($grid, $amount) : $this->foldX($grid, $amount);
+            $grid = 'y' === $fold ? $this->foldY($grid, $amount) : $this->foldX($grid, $amount);
 
             if ($onlyFirst) {
                 break;
@@ -107,6 +111,11 @@ class Day13 implements DayInterface
         return $grid;
     }
 
+    /**
+     * @param array<int, array<int, string>> $grid
+     *
+     * @return array<int, array<int, string>>
+     */
     private function foldY(array $grid, int $foldValue): array
     {
         $newGrid = [];
@@ -121,6 +130,11 @@ class Day13 implements DayInterface
         return $newGrid;
     }
 
+    /**
+     * @param array<int, array<int, string>> $grid
+     *
+     * @return array<int, array<int, string>>
+     */
     private function foldX(array $grid, int $foldValue): array
     {
         $newGrid = [];

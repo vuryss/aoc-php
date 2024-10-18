@@ -74,6 +74,7 @@ class Day14 implements DayInterface
         $between = [];
 
         foreach (explode("\n", $insertions) as $insertion) {
+            /** @var string $pair */
             [$pair, $character] = sscanf($insertion, '%s -> %s');
             $between[$pair] = $character;
         }
@@ -104,6 +105,6 @@ class Day14 implements DayInterface
             $charCounter[$pair[1]] = ($charCounter[$pair[1]] ?? 0) + $count;
         }
 
-        return max($charCounter) / 2 - min($charCounter) / 2;
+        return (int) (max($charCounter) / 2 - min($charCounter) / 2);
     }
 }

@@ -53,8 +53,8 @@ class Day2 implements DayInterface
             preg_match('/(\d+)-(\d+)\s(\w):\s(\w+)$/', $item, $matches);
             [, $pos1, $pos2, $char, $password] = $matches;
 
-            $firstChar = $password[$pos1 - 1] ?? '';
-            $secondChar = $password[$pos2 - 1] ?? '';
+            $firstChar = $password[(int) $pos1 - 1] ?? '';
+            $secondChar = $password[(int) $pos2 - 1] ?? '';
 
             if ($firstChar === $char && $secondChar !== $char || $firstChar !== $char && $secondChar === $char) {
                 $count++;

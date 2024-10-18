@@ -14,17 +14,11 @@ interface DayInterface
     public function testPart2(): iterable;
 
     /**
-     * @param string $input
-     *
-     * @return string|int
      * @throws Exception
      */
     public function solvePart1(string $input): string|int;
 
     /**
-     * @param string $input
-     *
-     * @return string|int
      * @throws Exception
      */
     public function solvePart2(string $input): string|int;

@@ -118,11 +118,12 @@ class Day10 implements DayInterface
         $threes = 1;
 
         for ($i = 0, $max = count($adapters); $i < $max; $i++) {
+            /** @psalm-suppress InvalidArrayOffset */
             $diff = $adapters[$i] - ($adapters[$i - 1] ?? 0);
 
-            if ($diff === 1) {
+            if (1 === $diff) {
                 $ones++;
-            } elseif ($diff === 3) {
+            } elseif (3 === $diff) {
                 $threes++;
             }
         }
@@ -140,7 +141,7 @@ class Day10 implements DayInterface
         ksort($adapterMap);
 
         foreach ($adapterMap as $key => $value) {
-            if ($key === 0) continue;
+            if (0 === $key) continue;
 
             $combinations = 0;
 

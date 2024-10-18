@@ -54,7 +54,7 @@ class Day8 implements DayInterface
 
         $position = $this->reverseEngineerIncorrectInstruction($instructions, $visited);
 
-        $instructions[$position][0] = $instructions[$position][0] === 'jmp' ? 'nop' : 'jmp';
+        $instructions[$position][0] = 'jmp' === $instructions[$position][0] ? 'nop' : 'jmp';
 
         return (string) $this->runProgram($instructions);
     }
@@ -121,7 +121,7 @@ class Day8 implements DayInterface
             $max = $min = $queue->dequeue();
 
             for ($i = $max - 1; $i >= 0; $i--) {
-                if ($instructions[$i][0] === 'jmp') {
+                if ('jmp' === $instructions[$i][0]) {
                     if ($instructions[$i][1] > 0 && $instructions[$i][1] + $i > $max || $instructions[$i][1] <= 0) {
                         break;
                     }
@@ -135,19 +135,19 @@ class Day8 implements DayInterface
             }
 
             foreach ($instructions as $position => $instruction) {
-                if ($position >= $min && $position <= $max || $instruction[0] === 'acc') {
+                if ($position >= $min && $position <= $max || 'acc' === $instruction[0]) {
                     continue;
                 }
 
                 $newPosition = $position + $instruction[1];
 
                 if ($newPosition >= $min && $newPosition <= $max) {
-                    if ($instruction[0] === 'nop' && isset($visited[$position])) {
+                    if ('nop' === $instruction[0] && isset($visited[$position])) {
                         return $position;
                     }
 
-                    if ($instruction[0] === 'jmp') {
-                        $queue[] = $position;
+                    if ('jmp' === $instruction[0]) {
+                        $queue->enqueue($position);
                     }
                 }
             }
