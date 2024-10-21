@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Util;
 
-class Point2D
+use Ds\Hashable;
+
+class Point2D implements Hashable
 {
     public function __construct(
         public int $x,
@@ -45,5 +47,15 @@ class Point2D
     public function clone(): Point2D
     {
         return new Point2D($this->x, $this->y);
+    }
+
+    public function equals(mixed $obj): bool
+    {
+        return $obj instanceof Point2D && $this->x === $obj->x && $this->y === $obj->y;
+    }
+
+    public function hash(): string
+    {
+        return 'Point2D('. $this->x . ',' . $this->y . ')';
     }
 }
