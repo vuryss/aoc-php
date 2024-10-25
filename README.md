@@ -32,11 +32,15 @@ Execute those inside the docker container:
 `./app generate --event 2016` - Generate for event 2016, current day (if between 1 and 25)
 
 ### Test and execute solutions
-`./app solve -d 1` - to execute with AoC user input for current year's event
+If year is not given (-y xxxx or --event xxxx), then it takes current year if we're in December, otherwise it takes the last available event
 
-`./app solve -d 1 -y 2019` - to execute with user input for previous event
+`./app solve -d 1` - to execute day 1 with AoC user input (downloaded automatically)
 
-`./app solve -d 1 --test` - to execute with tests inputs (defined in the wrapper class)
+`./app solve -d 1 -y 2019` - to execute day 1 with user input (downloaded automatically) for event 2019
+
+`./app solve -d 1 --test` - to execute solution for day 1 with tests inputs (defined in the solution class)
+
+`./app solve -t 2020 -d 1 --validate` - validate already solved day 1 year 2020 in AoC, downloading the answers and checking the solution against them
 
 ---
 
