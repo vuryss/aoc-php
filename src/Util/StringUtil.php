@@ -8,7 +8,7 @@ readonly class StringUtil
 {
     public static function extractIntegers(string $string): array
     {
-        preg_match_all('/\d+/', $string, $matches);
+        preg_match_all('/-?\d+/', $string, $matches);
 
         return array_map('intval', $matches[0]);
     }
