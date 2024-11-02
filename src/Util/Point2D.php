@@ -14,6 +14,9 @@ class Point2D implements Hashable
     ) {
     }
 
+    /**
+     * @return array<Point2D>
+     */
     public function surrounding(): array
     {
         return [
@@ -26,6 +29,34 @@ class Point2D implements Hashable
             new Point2D($this->x, $this->y + 1),
             new Point2D($this->x + 1, $this->y + 1),
         ];
+    }
+
+    /**
+     * @return array<Point2D>
+     */
+    public function adjacent(): array
+    {
+        return [$this->north(), $this->east(), $this->south(), $this->west()];
+    }
+
+    public function north(): Point2D
+    {
+        return new Point2D($this->x, $this->y - 1);
+    }
+
+    public function south(): Point2D
+    {
+        return new Point2D($this->x, $this->y + 1);
+    }
+
+    public function east(): Point2D
+    {
+        return new Point2D($this->x + 1, $this->y);
+    }
+
+    public function west(): Point2D
+    {
+        return new Point2D($this->x - 1, $this->y);
     }
 
     public function isSurrounding(Point2D $point): bool
