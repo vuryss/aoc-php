@@ -59,6 +59,11 @@ class Point2D implements Hashable
         return new Point2D($this->x - 1, $this->y);
     }
 
+    public function manhattanDistance(Point2D $point): int
+    {
+        return abs($this->x - $point->x) + abs($this->y - $point->y);
+    }
+
     public function isSurrounding(Point2D $point): bool
     {
         foreach ($this->surrounding() as $surroundingPoint) {
