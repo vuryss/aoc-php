@@ -39,4 +39,9 @@ class Grid
     {
         return count($this->grid, COUNT_RECURSIVE) - count($this->grid);
     }
+
+    public function hash(): string
+    {
+        return json_encode($this->grid);
+    }
 }

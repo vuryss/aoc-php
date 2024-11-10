@@ -11,4 +11,5 @@ RUN install-php-extensions \
     xdebug
 
 RUN echo 'xdebug.client_host = host.docker.internal' >> /usr/local/etc/php/conf.d/z-xdebug.ini && \
+    echo 'xdebug.output_dir = /app' >> /usr/local/etc/php/conf.d/z-xdebug.ini && \
     echo 'memory_limit = 16G' >> /usr/local/etc/php/conf.d/z-memory-limit.ini
