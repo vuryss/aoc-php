@@ -12,4 +12,16 @@ readonly class StringUtil
 
         return array_map('intval', $matches[0]);
     }
+
+    public static function inputToGridOfChars(string $string): array
+    {
+        $grid = [];
+        $y = 0;
+
+        foreach (explode("\n", $string) as $line) {
+            $grid[$y++] = str_split($line);
+        }
+
+        return $grid;
+    }
 }
