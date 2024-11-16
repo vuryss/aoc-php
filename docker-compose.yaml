@@ -4,13 +4,13 @@ services:
     app:
         build:
             context: .
-            dockerfile: Dockerfile
+            dockerfile: docker/Dockerfile
         volumes:
             - '.:/app'
         extra_hosts:
             - 'host.docker.internal:host-gateway'
         environment:
-            XDEBUG_MODE: debug
+            XDEBUG_MODE: off
             PHP_IDE_CONFIG: "serverName=app"
         working_dir: /app
         command:
