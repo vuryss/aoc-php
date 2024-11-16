@@ -59,6 +59,36 @@ class Point2D implements Hashable
         return new Point2D($this->x - 1, $this->y);
     }
 
+    public function leftFromDirection(RelativeDirection $direction): Point2D
+    {
+        return match ($direction) {
+            RelativeDirection::UP => $this->west(),
+            RelativeDirection::DOWN => $this->east(),
+            RelativeDirection::LEFT => $this->south(),
+            RelativeDirection::RIGHT => $this->north(),
+        };
+    }
+
+    public function rightFromDirection(RelativeDirection $direction): Point2D
+    {
+        return match ($direction) {
+            RelativeDirection::UP => $this->east(),
+            RelativeDirection::DOWN => $this->west(),
+            RelativeDirection::LEFT => $this->north(),
+            RelativeDirection::RIGHT => $this->south(),
+        };
+    }
+
+    public function forwardFromDirection(RelativeDirection $direction): Point2D
+    {
+        return match ($direction) {
+            RelativeDirection::UP => $this->north(),
+            RelativeDirection::DOWN => $this->south(),
+            RelativeDirection::LEFT => $this->west(),
+            RelativeDirection::RIGHT => $this->east(),
+        };
+    }
+
     public function manhattanDistance(Point2D $point): int
     {
         return abs($this->x - $point->x) + abs($this->y - $point->y);
