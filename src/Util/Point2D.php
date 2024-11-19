@@ -39,24 +39,24 @@ class Point2D implements Hashable
         return [$this->north(), $this->east(), $this->south(), $this->west()];
     }
 
-    public function north(): Point2D
+    public function north(int $steps = 1): Point2D
     {
-        return new Point2D($this->x, $this->y - 1);
+        return new Point2D($this->x, $this->y - $steps);
     }
 
-    public function south(): Point2D
+    public function south(int $steps = 1): Point2D
     {
-        return new Point2D($this->x, $this->y + 1);
+        return new Point2D($this->x, $this->y + $steps);
     }
 
-    public function east(): Point2D
+    public function east(int $steps = 1): Point2D
     {
-        return new Point2D($this->x + 1, $this->y);
+        return new Point2D($this->x + $steps, $this->y);
     }
 
-    public function west(): Point2D
+    public function west(int $steps = 1): Point2D
     {
-        return new Point2D($this->x - 1, $this->y);
+        return new Point2D($this->x - $steps, $this->y);
     }
 
     public function leftFromDirection(RelativeDirection $direction): Point2D
