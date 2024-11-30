@@ -10,4 +10,24 @@ enum CompassDirection: string
     case EAST = 'E';
     case SOUTH = 'S';
     case WEST = 'W';
+
+    public function turnLeft(): CompassDirection
+    {
+        return match ($this) {
+            self::NORTH => self::WEST,
+            self::EAST => self::NORTH,
+            self::SOUTH => self::EAST,
+            self::WEST => self::SOUTH,
+        };
+    }
+
+    public function turnRight(): CompassDirection
+    {
+        return match ($this) {
+            self::NORTH => self::EAST,
+            self::EAST => self::SOUTH,
+            self::SOUTH => self::WEST,
+            self::WEST => self::NORTH,
+        };
+    }
 }
