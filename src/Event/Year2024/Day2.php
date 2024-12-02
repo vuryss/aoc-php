@@ -54,14 +54,9 @@ class Day2 implements DayInterface
 
     private function isSafe(array $numbers): bool
     {
-        return $this->isSafeIncreasing($numbers) || $this->isSafeIncreasing(array_reverse($numbers));
-    }
-
-    private function isSafeIncreasing(array $numbers): bool
-    {
-        return !array_any(
+        return array_any([$numbers, array_reverse($numbers)], fn ($numbers) => !array_any(
             range(1, count($numbers) - 1),
             fn ($i) => !in_array($numbers[$i] - $numbers[$i - 1], [1, 2, 3])
-        );
+        ));
     }
 }
