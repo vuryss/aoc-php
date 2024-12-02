@@ -35,51 +35,33 @@ class Day2 implements DayInterface
 
     public function solvePart1(string $input): string|int
     {
-        $numberLines = array_map(StringUtil::extractIntegers(...), explode("\n", $input));
-
-        return count(array_filter($numberLines, $this->isSafe(...)));
+        return count(array_filter(
+            array_map(StringUtil::extractIntegers(...), explode("\n", $input)),
+            $this->isSafe(...))
+        );
     }
 
     public function solvePart2(string $input): string|int
     {
-        $numberLines = array_map(StringUtil::extractIntegers(...), explode("\n", $input));
-        $count = 0;
-
-        foreach ($numberLines as $numbers) {
-            if ($this->isSafe($numbers)) {
-                $count++;
-
-                continue;
-            }
-
-            for ($i = 0; $i < count($numbers); $i++) {
-                $newNumbers = array_diff_key($numbers, [$i => true]);
-
-                if ($this->isSafe(array_values($newNumbers))) {
-                    $count++;
-                    break;
-                }
-            }
-        }
-
-        return $count;
+        return count(array_filter(
+            array_map(StringUtil::extractIntegers(...), explode("\n", $input)),
+            fn ($numbers) => array_any(
+                range(0, count($numbers) - 1),
+                fn ($i) => $this->isSafe(array_values(array_diff_key($numbers, [$i => true])))
+            )
+        ));
     }
 
     private function isSafe(array $numbers): bool
     {
-        $allIncreasing = true;
-        $allDecreasing = true;
-        $maxDifference = 0;
-        $minDifference = PHP_INT_MAX;
+        return $this->isSafeIncreasing($numbers) || $this->isSafeIncreasing(array_reverse($numbers));
+    }
 
-        for ($i = 1; $i < count($numbers); $i++) {
-            $difference = $numbers[$i] - $numbers[$i - 1];
-            $maxDifference = max($maxDifference, abs($difference));
-            $minDifference = min($minDifference, abs($difference));
-            $allIncreasing = !($allIncreasing === false) && $difference > 0;
-            $allDecreasing = !($allDecreasing === false) && $difference < 0;
-        }
-
-        return ($allIncreasing === true || $allDecreasing === true) && $maxDifference <= 3 && $minDifference >= 1;
+    private function isSafeIncreasing(array $numbers): bool
+    {
+        return !array_any(
+            range(1, count($numbers) - 1),
+            fn ($i) => !in_array($numbers[$i] - $numbers[$i - 1], [1, 2, 3])
+        );
     }
 }
