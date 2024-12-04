@@ -44,55 +44,26 @@ class Day4 implements DayInterface
     public function solvePart1(string $input): string|int
     {
         $grid = StringUtil::inputToGridOfChars($input);
-        $count = 0;
+        $d = [-1, 0, 1];
+        $words = [];
 
         foreach ($grid as $y => $row) {
             foreach ($row as $x => $char) {
                 if ($char === 'X') {
-                    // Horizontally
-                    if ($x + 3 < count($row) && $row[$x + 1] === 'M' && $row[$x + 2] === 'A' && $row[$x + 3] === 'S') {
-                        $count++;
-                    }
-
-                    // Horizontally (backwards)
-                    if ($x - 3 >= 0 && $row[$x - 1] === 'M' && $row[$x - 2] === 'A' && $row[$x - 3] === 'S') {
-                        $count++;
-                    }
-
-                    // Vertically
-                    if ($y + 3 < count($grid) && $grid[$y + 1][$x] === 'M' && $grid[$y + 2][$x] === 'A' && $grid[$y + 3][$x] === 'S') {
-                        $count++;
-                    }
-
-                    // Vertically (backwards)
-                    if ($y - 3 >= 0 && $grid[$y - 1][$x] === 'M' && $grid[$y - 2][$x] === 'A' && $grid[$y - 3][$x] === 'S') {
-                        $count++;
-                    }
-
-                    // Diagonally (bottom right)
-                    if ($x + 3 < count($row) && $y + 3 < count($grid) && $grid[$y + 1][$x + 1] === 'M' && $grid[$y + 2][$x + 2] === 'A' && $grid[$y + 3][$x + 3] === 'S') {
-                        $count++;
-                    }
-
-                    // Diagonally (bottom left)
-                    if ($x - 3 >= 0 && $y + 3 < count($grid) && $grid[$y + 1][$x - 1] === 'M' && $grid[$y + 2][$x - 2] === 'A' && $grid[$y + 3][$x - 3] === 'S') {
-                        $count++;
-                    }
-
-                    // Diagonally (top right)
-                    if ($x + 3 < count($row) && $y - 3 >= 0 && $grid[$y - 1][$x + 1] === 'M' && $grid[$y - 2][$x + 2] === 'A' && $grid[$y - 3][$x + 3] === 'S') {
-                        $count++;
-                    }
-
-                    // Diagonally (top left)
-                    if ($x - 3 >= 0 && $y - 3 >= 0 && $grid[$y - 1][$x - 1] === 'M' && $grid[$y - 2][$x - 2] === 'A' && $grid[$y - 3][$x - 3] === 'S') {
-                        $count++;
+                    for ($n = 1; $n < 4; $n++) {
+                        foreach ($d as $dx) {
+                            foreach ($d as $dy) {
+                                $key = "{$x},{$y},{$dx},{$dy}";
+                                $words[$key] = $words[$key] ?? $char;
+                                $words[$key] .= $grid[$y + $n * $dy][$x + $n * $dx] ?? '';
+                            }
+                        }
                     }
                 }
             }
         }
 
-        return $count;
+        return count(array_filter($words, fn($word) => $word === 'XMAS'));
     }
 
     public function solvePart2(string $input): string|int
