@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Event\Year2024;
 
 use App\Event\DayInterface;
+use App\Util\Delta;
 use App\Util\StringUtil;
 
 class Day4 implements DayInterface
@@ -44,20 +45,15 @@ class Day4 implements DayInterface
     public function solvePart1(string $input): string|int
     {
         $grid = StringUtil::inputToGridOfChars($input);
-        $d = [-1, 0, 1];
         $words = [];
 
         foreach ($grid as $y => $row) {
             foreach ($row as $x => $char) {
-                if ($char === 'X') {
-                    for ($n = 1; $n < 4; $n++) {
-                        foreach ($d as $dx) {
-                            foreach ($d as $dy) {
-                                $key = "{$x},{$y},{$dx},{$dy}";
-                                $words[$key] = $words[$key] ?? $char;
-                                $words[$key] .= $grid[$y + $n * $dy][$x + $n * $dx] ?? '';
-                            }
-                        }
+                for ($n = 1; $n < 4; $n++) {
+                    foreach (Delta::SURROUNDING as $d) {
+                        $key = "{$x},{$y},{$d[0]},{$d[1]}";
+                        $words[$key] = $words[$key] ?? $char;
+                        $words[$key] .= $grid[$y + $n * $d[0]][$x + $n * $d[1]] ?? '';
                     }
                 }
             }
@@ -73,14 +69,8 @@ class Day4 implements DayInterface
 
         foreach ($grid as $y => $row) {
             foreach ($row as $x => $char) {
-                if ($char == 'A') {
-                    $a = ($grid[$y + 1][$x + 1] ?? '') . ($grid[$y - 1][$x - 1] ?? '');
-                    $b = ($grid[$y + 1][$x - 1] ?? '') . ($grid[$y - 1][$x + 1] ?? '');
-
-                    if (preg_match('/MS|SM/', $a) && preg_match('/MS|SM/', $b)) {
-                        $count++;
-                    }
-                }
+                $word = array_map(fn ($d) => $grid[$y + $d[0]][$x + $d[1]] ?? '', Delta::DIAGONAL_INCLUSIVE);
+                $count += preg_match('/ASSMM|AMMSS|ASMMS|AMSSM/', implode('', $word));
             }
         }
 
