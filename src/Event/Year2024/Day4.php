@@ -73,66 +73,17 @@ class Day4 implements DayInterface
 
         foreach ($grid as $y => $row) {
             foreach ($row as $x => $char) {
-                if ($char === 'M') {
-                    // MAS (bottom right)
-                    if (
-                        $x + 2 < count($row)
-                        && $y + 2 < count($grid)
-                        && $grid[$y + 1][$x + 1] === 'A'
-                        && $grid[$y + 2][$x + 2] === 'S'
-                        && (
-                            ($grid[$y][$x + 2] === 'S' && $grid[$y + 2][$x] === 'M')
-                            || ($grid[$y][$x + 2] === 'M' && $grid[$y + 2][$x] === 'S')
-                        )
-                    ) {
-                        $count++;
-                    }
+                if ($char == 'A') {
+                    $a = ($grid[$y + 1][$x + 1] ?? '') . ($grid[$y - 1][$x - 1] ?? '');
+                    $b = ($grid[$y + 1][$x - 1] ?? '') . ($grid[$y - 1][$x + 1] ?? '');
 
-                    // MAS (bottom left)
-                    if (
-                        $x - 2 >= 0
-                        && $y + 2 < count($grid)
-                        && $grid[$y + 1][$x - 1] === 'A'
-                        && $grid[$y + 2][$x - 2] === 'S'
-                        && (
-                            ($grid[$y][$x - 2] === 'S' && $grid[$y + 2][$x] === 'M')
-                            || ($grid[$y][$x - 2] === 'M' && $grid[$y + 2][$x] === 'S')
-                        )
-                    ) {
-                        $count++;
-                    }
-
-                    // MAS (top right)
-                    if (
-                        $x + 2 < count($row)
-                        && $y - 2 >= 0
-                        && $grid[$y - 1][$x + 1] === 'A'
-                        && $grid[$y - 2][$x + 2] === 'S'
-                        && (
-                            ($grid[$y][$x + 2] === 'S' && $grid[$y - 2][$x] === 'M')
-                            || ($grid[$y][$x + 2] === 'M' && $grid[$y - 2][$x] === 'S')
-                        )
-                    ) {
-                        $count++;
-                    }
-
-                    // MAS (top left)
-                    if (
-                        $x - 2 >= 0
-                        && $y - 2 >= 0
-                        && $grid[$y - 1][$x - 1] === 'A'
-                        && $grid[$y - 2][$x - 2] === 'S'
-                        && (
-                            ($grid[$y][$x - 2] === 'S' && $grid[$y - 2][$x] === 'M')
-                            || ($grid[$y][$x - 2] === 'M' && $grid[$y - 2][$x] === 'S')
-                        )
-                    ) {
+                    if (preg_match('/MS|SM/', $a) && preg_match('/MS|SM/', $b)) {
                         $count++;
                     }
                 }
             }
         }
 
-        return $count / 2;
+        return $count;
     }
 }
