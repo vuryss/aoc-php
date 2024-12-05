@@ -85,19 +85,12 @@ class Day5 implements DayInterface
         $sum = 0;
 
         foreach ($updates as $line) {
-            $pages = array_flip($line);
+            $sorted = $line;
+            usort($sorted, fn ($a, $b) => in_array([$a, $b], $rules) ? -1 : 1);
 
-            foreach ($rules as $rule) {
-                if (
-                    array_key_exists($rule[0], $pages)
-                    && array_key_exists($rule[1], $pages)
-                    && $pages[$rule[0]] > $pages[$rule[1]]
-                ) {
-                    continue 2;
-                }
+            if ($line === $sorted) {
+                $sum += $line[count($line) / 2];
             }
-
-            $sum += $line[count($line) / 2];
         }
 
         return $sum;
@@ -109,47 +102,14 @@ class Day5 implements DayInterface
         $rules = array_map(StringUtil::extractIntegers(...), explode("\n", $parts[0]));
         $updates = array_map(StringUtil::extractIntegers(...), explode("\n", $parts[1]));
         $sum = 0;
-        $incorrectLines = [];
 
         foreach ($updates as $line) {
-            $pages = array_flip($line);
+            $sorted = $line;
+            usort($sorted, fn ($a, $b) => in_array([$a, $b], $rules) ? -1 : 1);
 
-            foreach ($rules as $rule) {
-                if (
-                    array_key_exists($rule[0], $pages)
-                    && array_key_exists($rule[1], $pages)
-                    && $pages[$rule[0]] > $pages[$rule[1]]
-                ) {
-                    $incorrectLines[] = $line;
-                    break;
-                }
+            if ($line !== $sorted) {
+                $sum += $sorted[count($sorted) / 2];
             }
-        }
-
-        foreach ($incorrectLines as $line) {
-            $pages = array_flip($line);
-            $change = true;
-
-            while ($change) {
-                $change = false;
-
-                foreach ($rules as $rule) {
-                    if (
-                        array_key_exists($rule[0], $pages)
-                        && array_key_exists($rule[1], $pages)
-                        && $pages[$rule[0]] > $pages[$rule[1]]
-                    ) {
-                        $temp = $pages[$rule[0]];
-                        $pages[$rule[0]] = $pages[$rule[1]];
-                        $pages[$rule[1]] = $temp;
-                        $change = true;
-                        break;
-                    }
-                }
-            }
-
-            $line = array_flip($pages);
-            $sum += $line[count($line) / 2];
         }
 
         return $sum;
