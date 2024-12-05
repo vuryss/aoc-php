@@ -2,8 +2,13 @@
 
 ## Events added
 
-- [2020](https://adventofcode.com/2020)
-- [2021](https://adventofcode.com/2021) (default)
+- [2020](https://adventofcode.com/2020) (all solutions available)
+- [2021](https://adventofcode.com/2021) (all solutions available)
+- [2022](https://adventofcode.com/2022) (not included - check java repo: https://github.com/vuryss/aoc-java)
+- [2023](https://adventofcode.com/2023) (partially solved - full event @ java repo: https://github.com/vuryss/aoc-java)
+- [2024](https://adventofcode.com/2024) (default)
+
+For previous years, check other repositories in my profile.
 
 ## Requirements
 
@@ -40,7 +45,7 @@ If year is not given (-y xxxx or --event xxxx), then it takes current year if we
 
 `./app solve -d 1 --test` - to execute solution for day 1 with tests inputs (defined in the solution class)
 
-`./app solve -t 2020 -d 1 --validate` - validate already solved day 1 year 2020 in AoC, downloading the answers and checking the solution against them
+`./app solve -y 2020 -d 1 --validate` - validate already solved day 1 year 2020 in AoC, downloading the answers and checking the solution against them
 
 ---
 
