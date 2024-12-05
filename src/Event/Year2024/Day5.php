@@ -87,10 +87,7 @@ class Day5 implements DayInterface
         foreach ($updates as $line) {
             $sorted = $line;
             usort($sorted, fn ($a, $b) => in_array([$a, $b], $rules) ? -1 : 1);
-
-            if ($line === $sorted) {
-                $sum += $line[count($line) / 2];
-            }
+            $sum += $line === $sorted ? $line[count($line) / 2] : 0;
         }
 
         return $sum;
@@ -106,10 +103,7 @@ class Day5 implements DayInterface
         foreach ($updates as $line) {
             $sorted = $line;
             usort($sorted, fn ($a, $b) => in_array([$a, $b], $rules) ? -1 : 1);
-
-            if ($line !== $sorted) {
-                $sum += $sorted[count($sorted) / 2];
-            }
+            $sum += $line !== $sorted ? $sorted[count($sorted) / 2] : 0;
         }
 
         return $sum;
