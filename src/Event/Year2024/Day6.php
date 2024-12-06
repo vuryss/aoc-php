@@ -5,13 +5,17 @@ declare(strict_types=1);
 namespace App\Event\Year2024;
 
 use App\Event\DayInterface;
-use App\Util\CompassDirection;
-use App\Util\Point2D;
-use App\Util\RelativeDirection;
 use App\Util\StringUtil;
 
 class Day6 implements DayInterface
 {
+    private const array DELTAS = [
+        'U' => [0, -1, 'R', 'U'],
+        'R' => [1, 0, 'D', 'R'],
+        'D' => [0, 1, 'L', 'D'],
+        'L' => [-1, 0, 'U', 'L'],
+    ];
+
     public function testPart1(): iterable
     {
         yield '41' => <<<'INPUT'
@@ -47,86 +51,52 @@ class Day6 implements DayInterface
     public function solvePart1(string $input): string|int
     {
         $grid = StringUtil::inputToGridOfChars($input);
-        $p = null;
+        [$x, $y] = [0, 0];
 
         foreach ($grid as $y => $line) {
             foreach ($line as $x => $char) {
                 if ($char === '^') {
-                    $p = new Point2D($x, $y);
+                    break 2;
                 }
             }
         }
 
-        $visited = $this->getVisitedPoints($grid, $p);
-        $visited = end($visited);
-        $count = 0;
+        $visited = $this->getVisitedPoints($grid, $x, $y);
 
-        foreach ($visited as $yLine) {
-            $count += count($yLine);
-        }
-
-        return $count;
+        return array_reduce(end($visited), fn($carry, $item) => $carry + count($item), 0);
     }
 
     public function solvePart2(string $input): string|int
     {
         $grid = StringUtil::inputToGridOfChars($input);
-        $p = null;
+        [$x, $y] = [0, 0];
 
         foreach ($grid as $y => $line) {
             foreach ($line as $x => $char) {
                 if ($char === '^') {
-                    $p = new Point2D($x, $y);
+                    break 2;
                 }
             }
         }
 
-        $visited = $this->getVisitedPoints($grid, $p);
-        $lastState = end($visited);
-
+        $visited = $this->getVisitedPoints($grid, $x, $y);
         $blocks = [];
 
-        foreach ($lastState as $visitedY => $data) {
+        foreach ($visited[array_key_last($visited)] as $visitedY => $data) {
             foreach ($data as $visitedX => $visitedDirections) {
-                foreach ($visitedDirections as $step => $visitedDir) {
-                    $blockPosition = new Point2D($visitedX, $visitedY)->forwardFromDirection($visitedDir);
+                foreach ($visitedDirections as $visitedDir => $step) {
+                    $d = self::DELTAS[$visitedDir];
+                    [$bx, $by] = [$visitedX + $d[0], $visitedY + $d[1]];
 
-                    if (($grid[$blockPosition->y][$blockPosition->x] ?? '') !== '.') {
+                    if (($grid[$by][$bx] ?? '') !== '.' || isset($visited[$step][$by][$bx])) {
                         continue;
                     }
 
-                    $visitedByFar = $visited[$step];
-
-                    if (isset($visitedByFar[$blockPosition->y][$blockPosition->x])) {
-                        continue;
-                    }
-
-                    $p = new Point2D($visitedX, $visitedY);
-                    $dir = $visitedDir;
-                    $newVisited = $visited[$step];
                     $newGrid = $grid;
-                    $newGrid[$blockPosition->y][$blockPosition->x] = '#';
+                    $newGrid[$by][$bx] = '#';
 
-                    while (true) {
-                        $next = $p->forwardFromDirection($dir);
-
-                        if (in_array($dir, $newVisited[$next->y][$next->x] ?? [])) {
-                            $blocks[$blockPosition->y][$blockPosition->x] = true;
-                            break;
-                        }
-
-                        if (!isset($newGrid[$next->y][$next->x])) {
-                            break;
-                        }
-
-                        if ($newGrid[$next->y][$next->x] === '#') {
-                            $dir = $dir->turnRight();
-                            $newVisited[$p->y][$p->x][] = $dir;
-                            continue;
-                        }
-
-                        $p = $next;
-                        $newVisited[$p->y][$p->x][] = $dir;
+                    if ($this->isLooped($visitedX, $visitedY, $visitedDir, $newGrid, $visited[$step])) {
+                        $blocks[$by][$bx] = true;
                     }
                 }
             }
@@ -135,33 +105,48 @@ class Day6 implements DayInterface
         return count($blocks, COUNT_RECURSIVE) - count($blocks);
     }
 
-    private function getVisitedPoints(array $grid, Point2D $point): ?array
+    private function isLooped(int $x, int $y, string $direction, array $grid, array $visited): bool
     {
-        $dir = RelativeDirection::UP;
+        $dir = self::DELTAS[$direction];
+        [$nx, $ny] = [$x + $dir[0], $y + $dir[1]];
+
+        while (isset($grid[$ny][$nx]) && !isset($visited[$ny][$nx][$dir[3]])) {
+            if ($grid[$ny][$nx] === '#') {
+                $dir = self::DELTAS[$dir[2]];
+            } else {
+                [$x, $y] = [$nx, $ny];
+            }
+
+            $visited[$y][$x][$dir[3]] = true;
+            [$nx, $ny] = [$x + $dir[0], $y + $dir[1]];
+        }
+
+        return isset($visited[$ny][$nx][$dir[3]]);
+    }
+
+    private function getVisitedPoints(array $grid, $x, $y): array
+    {
+        $dir = self::DELTAS['U'];
         $steps = 0;
-        $visited[$point->y][$point->x] = [$steps => $dir];
+        $visited[$y][$x] = [$dir[3] => $steps];
         $visitedWithDirections[$steps] = $visited;
 
         while (true) {
-            $next = $point->forwardFromDirection($dir);
+            [$nx, $ny] = [$x + $dir[0], $y + $dir[1]];
 
-            if (!isset($grid[$next->y][$next->x])) {
+            if (!isset($grid[$ny][$nx])) {
                 break;
             }
 
-            if (in_array($dir, ($visited[$next->y][$next->x] ?? []))) {
-                return null;
-            }
-
-            if ($grid[$next->y][$next->x] === '#') {
-                $dir = $dir->turnRight();
-                $visited[$point->y][$point->x][$steps] = $dir;
+            if ($grid[$ny][$nx] === '#') {
+                $dir = self::DELTAS[$dir[2]];
+                $visited[$y][$x][$dir[3]] = $steps;
                 continue;
             }
 
             $steps++;
-            $point = $next;
-            $visited[$point->y][$point->x][$steps] = $dir;
+            [$x, $y] = [$nx, $ny];
+            $visited[$y][$x][$dir[3]] = $steps;
             $visitedWithDirections[$steps] = $visited;
         }
 
