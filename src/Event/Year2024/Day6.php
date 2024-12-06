@@ -130,24 +130,19 @@ class Day6 implements DayInterface
         $steps = 0;
         $visited[$y][$x] = [$dir[3] => $steps];
         $visitedWithDirections[$steps] = $visited;
+        [$nx, $ny] = [$x + $dir[0], $y + $dir[1]];
 
-        while (true) {
-            [$nx, $ny] = [$x + $dir[0], $y + $dir[1]];
-
-            if (!isset($grid[$ny][$nx])) {
-                break;
-            }
-
+        while (isset($grid[$ny][$nx])) {
             if ($grid[$ny][$nx] === '#') {
                 $dir = self::DELTAS[$dir[2]];
-                $visited[$y][$x][$dir[3]] = $steps;
-                continue;
+            } else {
+                [$x, $y] = [$nx, $ny];
             }
 
             $steps++;
-            [$x, $y] = [$nx, $ny];
             $visited[$y][$x][$dir[3]] = $steps;
             $visitedWithDirections[$steps] = $visited;
+            [$nx, $ny] = [$x + $dir[0], $y + $dir[1]];
         }
 
         return $visitedWithDirections;
