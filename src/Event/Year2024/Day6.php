@@ -83,17 +83,17 @@ class Day6 implements DayInterface
 
         foreach ($this->getVisitedPoints($grid, $x, $y) as [$x, $y, $dir, $visited]) {
             $d = self::DELTAS[$dir];
-            [$bx, $by] = [$x + $d[0], $y + $d[1]];
+            [$blockX, $blockY] = [$x + $d[0], $y + $d[1]];
 
-            if (($grid[$by][$bx] ?? '') !== '.' || isset($visited[$by][$bx])) {
+            if (($grid[$blockY][$blockX] ?? '') !== '.' || isset($visited[$blockY][$blockX])) {
                 continue;
             }
 
-            $newGrid = $grid;
-            $newGrid[$by][$bx] = '#';
+            $gridCopy = $grid;
+            $gridCopy[$blockY][$blockX] = '#';
 
-            if ($this->isLooped($x, $y, $dir, $newGrid, $visited)) {
-                $blocks[$by][$bx] = true;
+            if ($this->isLooped($x, $y, $dir, $gridCopy, $visited)) {
+                $blocks[$blockY][$blockX] = true;
             }
         }
 
@@ -102,40 +102,40 @@ class Day6 implements DayInterface
 
     private function isLooped(int $x, int $y, string $direction, array $grid, array $visited): bool
     {
-        $dir = self::DELTAS[$direction];
-        [$nx, $ny] = [$x + $dir[0], $y + $dir[1]];
+        $d = self::DELTAS[$direction];
+        [$nextX, $nextY] = [$x + $d[0], $y + $d[1]];
 
-        while (isset($grid[$ny][$nx]) && !isset($visited[$ny][$nx][$dir[3]])) {
-            if ($grid[$ny][$nx] === '#') {
-                $dir = self::DELTAS[$dir[2]];
+        while (isset($grid[$nextY][$nextX]) && !isset($visited[$nextY][$nextX][$d[3]])) {
+            if ($grid[$nextY][$nextX] === '#') {
+                $d = self::DELTAS[$d[2]];
             } else {
-                [$x, $y] = [$nx, $ny];
+                [$x, $y] = [$nextX, $nextY];
             }
 
-            $visited[$y][$x][$dir[3]] = true;
-            [$nx, $ny] = [$x + $dir[0], $y + $dir[1]];
+            $visited[$y][$x][$d[3]] = true;
+            [$nextX, $nextY] = [$x + $d[0], $y + $d[1]];
 
         }
 
-        return isset($visited[$ny][$nx][$dir[3]]);
+        return isset($visited[$nextY][$nextX][$d[3]]);
     }
 
     private function getVisitedPoints(array $grid, $x, $y): iterable
     {
-        $dir = self::DELTAS['U'];
-        $visited[$y][$x] = [$dir[3] => true];
-        [$nx, $ny] = [$x + $dir[0], $y + $dir[1]];
+        $d = self::DELTAS['U'];
+        $visited[$y][$x] = [$d[3] => true];
+        [$nextX, $nextY] = [$x + $d[0], $y + $d[1]];
 
-        while (isset($grid[$ny][$nx])) {
-            if ($grid[$ny][$nx] === '#') {
-                $dir = self::DELTAS[$dir[2]];
+        while (isset($grid[$nextY][$nextX])) {
+            if ($grid[$nextY][$nextX] === '#') {
+                $d = self::DELTAS[$d[2]];
             } else {
-                [$x, $y] = [$nx, $ny];
+                [$x, $y] = [$nextX, $nextY];
             }
 
-            $visited[$y][$x][$dir[3]] = true;
-            [$nx, $ny] = [$x + $dir[0], $y + $dir[1]];
-            yield [$x, $y, $dir[3], $visited];
+            $visited[$y][$x][$d[3]] = true;
+            [$nextX, $nextY] = [$x + $d[0], $y + $d[1]];
+            yield [$x, $y, $d[3], $visited];
         }
     }
 }
