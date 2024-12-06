@@ -61,9 +61,9 @@ class Day6 implements DayInterface
             }
         }
 
-        $visited = $this->getVisitedPoints($grid, $x, $y);
+        foreach ($this->getVisitedPoints($grid, $x, $y) as [$x, $y, $dir, $visited]) {}
 
-        return array_reduce(end($visited), fn($carry, $item) => $carry + count($item), 0);
+        return array_reduce($visited, fn($carry, $item) => $carry + count($item), 0);
     }
 
     public function solvePart2(string $input): string|int
@@ -79,26 +79,21 @@ class Day6 implements DayInterface
             }
         }
 
-        $visited = $this->getVisitedPoints($grid, $x, $y);
         $blocks = [];
 
-        foreach ($visited[array_key_last($visited)] as $visitedY => $data) {
-            foreach ($data as $visitedX => $visitedDirections) {
-                foreach ($visitedDirections as $visitedDir => $step) {
-                    $d = self::DELTAS[$visitedDir];
-                    [$bx, $by] = [$visitedX + $d[0], $visitedY + $d[1]];
+        foreach ($this->getVisitedPoints($grid, $x, $y) as [$x, $y, $dir, $visited]) {
+            $d = self::DELTAS[$dir];
+            [$bx, $by] = [$x + $d[0], $y + $d[1]];
 
-                    if (($grid[$by][$bx] ?? '') !== '.' || isset($visited[$step][$by][$bx])) {
-                        continue;
-                    }
+            if (($grid[$by][$bx] ?? '') !== '.' || isset($visited[$by][$bx])) {
+                continue;
+            }
 
-                    $newGrid = $grid;
-                    $newGrid[$by][$bx] = '#';
+            $newGrid = $grid;
+            $newGrid[$by][$bx] = '#';
 
-                    if ($this->isLooped($visitedX, $visitedY, $visitedDir, $newGrid, $visited[$step])) {
-                        $blocks[$by][$bx] = true;
-                    }
-                }
+            if ($this->isLooped($x, $y, $dir, $newGrid, $visited)) {
+                $blocks[$by][$bx] = true;
             }
         }
 
@@ -119,17 +114,16 @@ class Day6 implements DayInterface
 
             $visited[$y][$x][$dir[3]] = true;
             [$nx, $ny] = [$x + $dir[0], $y + $dir[1]];
+
         }
 
         return isset($visited[$ny][$nx][$dir[3]]);
     }
 
-    private function getVisitedPoints(array $grid, $x, $y): array
+    private function getVisitedPoints(array $grid, $x, $y): iterable
     {
         $dir = self::DELTAS['U'];
-        $steps = 0;
-        $visited[$y][$x] = [$dir[3] => $steps];
-        $visitedWithDirections[$steps] = $visited;
+        $visited[$y][$x] = [$dir[3] => true];
         [$nx, $ny] = [$x + $dir[0], $y + $dir[1]];
 
         while (isset($grid[$ny][$nx])) {
@@ -139,12 +133,9 @@ class Day6 implements DayInterface
                 [$x, $y] = [$nx, $ny];
             }
 
-            $steps++;
-            $visited[$y][$x][$dir[3]] = $steps;
-            $visitedWithDirections[$steps] = $visited;
+            $visited[$y][$x][$dir[3]] = true;
             [$nx, $ny] = [$x + $dir[0], $y + $dir[1]];
+            yield [$x, $y, $dir[3], $visited];
         }
-
-        return $visitedWithDirections;
     }
 }
