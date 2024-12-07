@@ -47,7 +47,7 @@ class Day7 implements DayInterface
         foreach ($list as $numbers) {
             $result = array_shift($numbers);
 
-            foreach ($this->addOrMultiply($numbers) as $value) {
+            foreach ($this->p1($numbers, $result) as $value) {
                 if ($value === $result) {
                     $sum += $result;
                     break;
@@ -66,7 +66,7 @@ class Day7 implements DayInterface
         foreach ($list as $numbers) {
             $result = array_shift($numbers);
 
-            foreach ($this->addMultiplyConcatenate($numbers) as $value) {
+            foreach ($this->p2($numbers, $result) as $value) {
                 if ($value === $result) {
                     $sum += $result;
                     break;
@@ -77,34 +77,28 @@ class Day7 implements DayInterface
         return $sum;
     }
 
-    private function addOrMultiply(array $numbers): iterable
+    private function p1(array $numbers, int $max): iterable
     {
-        if (count($numbers) === 1) {
-            yield array_shift($numbers);
-            return;
-        }
-
         $num1 = array_pop($numbers);
 
-        foreach ($this->addOrMultiply($numbers) as $num2) {
-            yield $num1 + $num2;
-            yield $num1 * $num2;
+        foreach (count($numbers) === 1 ? $numbers : $this->p1($numbers, $max) as $num2) {
+            if ($num2 <= $max) {
+                yield $num1 + $num2;
+                yield $num1 * $num2;
+            }
         }
     }
 
-    private function addMultiplyConcatenate(array $numbers): iterable
+    private function p2(array $numbers, int $max): iterable
     {
-        if (count($numbers) === 1) {
-            yield array_shift($numbers);
-            return;
-        }
-
         $num1 = array_pop($numbers);
 
-        foreach ($this->addMultiplyConcatenate($numbers) as $num2) {
-            yield (int) ($num2 . $num1);
-            yield $num1 + $num2;
-            yield $num1 * $num2;
+        foreach (count($numbers) === 1 ? $numbers : $this->p2($numbers, $max) as $num2) {
+            if ($num2 <= $max) {
+                yield (int) ($num2 . $num1);
+                yield $num1 + $num2;
+                yield $num1 * $num2;
+            }
         }
     }
 }
