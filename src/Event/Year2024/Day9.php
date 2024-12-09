@@ -67,7 +67,7 @@ class Day9 implements DayInterface
             $blocks[$nextIndex] = ['size' => $digit, 'value' => $value];
 
             if ($value === null) {
-                $freeLocations[$nextIndex] = $digit;
+                $freeLocations[] = ['index' => $nextIndex, 'size' => $digit];
             }
 
             $nextIndex += $digit;
@@ -78,7 +78,7 @@ class Day9 implements DayInterface
                 continue;
             }
 
-            foreach ($freeLocations as $location => $size) {
+            foreach ($freeLocations as $freeLocationIndex => ['size' => $size, 'index' => $location]) {
                 if ($location > $index) {
                     break;
                 }
@@ -86,14 +86,14 @@ class Day9 implements DayInterface
                 if ($size >= $data['size']) {
                     $blocks[$location] = $data;
                     $blocks[$index] = ['size' => $data['size'], 'value' => null];
-                    unset($freeLocations[$location]);
 
                     if ($data['size'] < $size) {
                         $blocks[$location + $data['size']] = ['size' => $size - $data['size'], 'value' => null];
-                        $freeLocations[$location + $data['size']] = $size - $data['size'];
+                        $freeLocations[$freeLocationIndex] = ['index' => $location + $data['size'], 'size' => $size - $data['size']];
+                    } else {
+                        unset($freeLocations[$freeLocationIndex]);
                     }
 
-                    ksort($freeLocations);
                     break;
                 }
             }
