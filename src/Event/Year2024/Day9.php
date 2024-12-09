@@ -57,38 +57,42 @@ class Day9 implements DayInterface
     public function solvePart2(string $input): string|int
     {
         $chars = array_map(intval(...), str_split($input));
-        $disk = [];
         $fileIndex = 0;
-        $blockLocations = [];
-        $blockSizes = [];
         $freeLocations = [];
+        $blocks = [];
+        $nextIndex = 0;
 
         foreach ($chars as $index => $digit) {
-            if ($index % 2 === 0) {
-                $blockLocations[$fileIndex] = count($disk);
-                $blockSizes[$fileIndex] = $digit;
-                array_push($disk, ...array_fill(0, $digit, $fileIndex));
-                $fileIndex++;
-            } else {
-                $freeLocations[count($disk)] = $digit;
-                array_push($disk, ...array_fill(0, $digit, null));
+            $value = $index % 2 === 0 ? $fileIndex++ : null;
+            $blocks[$nextIndex] = ['size' => $digit, 'value' => $value];
+
+            if ($value === null) {
+                $freeLocations[$nextIndex] = $digit;
             }
+
+            $nextIndex += $digit;
         }
 
-        for ($fileIndex = count($blockLocations) - 1; $fileIndex > 0; $fileIndex--) {
-            foreach ($freeLocations as $index => $size) {
-                if ($index > $blockLocations[$fileIndex]) {
+        foreach (array_reverse($blocks, true) as $index => $data) {
+            if ($data['value'] === null) {
+                continue;
+            }
+
+            foreach ($freeLocations as $location => $size) {
+                if ($location > $index) {
                     break;
                 }
 
-                if ($size >= $blockSizes[$fileIndex]) {
-                    array_splice($disk, $index, $blockSizes[$fileIndex], array_fill(0, $blockSizes[$fileIndex], $fileIndex));
-                    array_splice($disk, $blockLocations[$fileIndex], $blockSizes[$fileIndex], array_fill(0, $blockSizes[$fileIndex], null));
-                    unset($freeLocations[$index]);
-                    if ($blockSizes[$fileIndex] < $size) {
-                        $freeLocations[$index + $blockSizes[$fileIndex]] = $size - $blockSizes[$fileIndex];
+                if ($size >= $data['size']) {
+                    $blocks[$location] = $data;
+                    $blocks[$index] = ['size' => $data['size'], 'value' => null];
+                    unset($freeLocations[$location]);
+
+                    if ($data['size'] < $size) {
+                        $blocks[$location + $data['size']] = ['size' => $size - $data['size'], 'value' => null];
+                        $freeLocations[$location + $data['size']] = $size - $data['size'];
                     }
-                    $freeLocations[$blockLocations[$fileIndex]] = $blockSizes[$fileIndex];
+
                     ksort($freeLocations);
                     break;
                 }
@@ -96,9 +100,13 @@ class Day9 implements DayInterface
         }
 
         $sum = 0;
+        $index = 0;
+        ksort($blocks);
 
-        foreach ($disk as $index => $fileIndex) {
-            $sum += $index * $fileIndex;
+        foreach ($blocks as $block) {
+            for ($i = 0; $i < $block['size']; $i++) {
+                $sum += $index++ * $block['value'];
+            }
         }
 
         return $sum;
