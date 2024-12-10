@@ -118,7 +118,6 @@ class Day10 implements DayInterface
             $queue = new Queue();
             $queue->push([$startPoint, 0]);
             $visited = [];
-            $score = 0;
 
             while (!$queue->isEmpty()) {
                 /** @var Point2D $point */
@@ -131,7 +130,7 @@ class Day10 implements DayInterface
                 $visited[$point->x][$point->y] = true;
 
                 if ($el === 9) {
-                    $score++;
+                    $sum++;
                     continue;
                 }
 
@@ -146,8 +145,6 @@ class Day10 implements DayInterface
                     }
                 }
             }
-
-            $sum += $score;
         }
 
         return $sum;
@@ -172,7 +169,6 @@ class Day10 implements DayInterface
         foreach ($startPoints as $startPoint) {
             $queue = new Queue();
             $queue->push([$startPoint, 0, []]);
-            $score = 0;
 
             while (!$queue->isEmpty()) {
                 /** @var Point2D $point */
@@ -185,7 +181,7 @@ class Day10 implements DayInterface
                 $visited[$point->x][$point->y] = true;
 
                 if ($el === 9) {
-                    $score++;
+                    $sum++;
                     continue;
                 }
 
@@ -200,8 +196,6 @@ class Day10 implements DayInterface
                     }
                 }
             }
-
-            $sum += $score;
         }
 
         return $sum;
