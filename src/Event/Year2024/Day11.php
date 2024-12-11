@@ -49,7 +49,7 @@ class Day11 implements DayInterface
         return $count;
     }
 
-    private function solve(int $number, int $iterations, int $level = 1) {
+    private function solve(int $number, int $iterations) {
         if ($iterations === 0) {
             return 1;
         }
@@ -59,14 +59,14 @@ class Day11 implements DayInterface
         }
 
         if ($number === 0) {
-            return $this->cache[$number][$iterations] = $this->solve(1, $iterations - 1, $level + 1);
+            return $this->cache[$number][$iterations] = $this->solve(1, $iterations - 1);
         }
 
         if (strlen((string) $number) % 2 === 0) {
             [$num1, $num2] = str_split((string) $number, strlen((string) $number) / 2);
-            return $this->cache[$number][$iterations] = $this->solve((int) $num1, $iterations - 1, $level + 1) + $this->solve((int) $num2, $iterations - 1, $level + 1);
+            return $this->cache[$number][$iterations] = $this->solve((int) $num1, $iterations - 1) + $this->solve((int) $num2, $iterations - 1);
         }
 
-        return $this->cache[$number][$iterations] = $this->solve($number * 2024, $iterations - 1, $level + 1);
+        return $this->cache[$number][$iterations] = $this->solve($number * 2024, $iterations - 1);
     }
 }
