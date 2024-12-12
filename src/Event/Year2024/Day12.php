@@ -158,33 +158,21 @@ class Day12 implements DayInterface
                             unset($perimeterPoints[$y][$x][$side]);
 
                             if ($side === 'N' || $side === 'S') {
-                                for ($x1 = $x + 1; $x1 < count($grid[0]); $x1++) {
-                                    if (!isset($perimeterPoints[$y][$x1][$side])) {
-                                        break;
-                                    }
+                                for ($x1 = $x + 1; isset($perimeterPoints[$y][$x1][$side]); $x1++) {
                                     unset($perimeterPoints[$y][$x1][$side]);
                                 }
 
-                                for ($x1 = $x - 1; $x1 >= 0; $x1--) {
-                                    if (!isset($perimeterPoints[$y][$x1][$side])) {
-                                        break;
-                                    }
+                                for ($x1 = $x - 1; isset($perimeterPoints[$y][$x1][$side]); $x1--) {
                                     unset($perimeterPoints[$y][$x1][$side]);
                                 }
                             }
 
                             if ($side === 'E' || $side === 'W') {
-                                for ($y1 = $y + 1; $y1 < count($grid); $y1++) {
-                                    if (!isset($perimeterPoints[$y1][$x][$side])) {
-                                        break;
-                                    }
+                                for ($y1 = $y + 1; isset($perimeterPoints[$y1][$x][$side]); $y1++) {
                                     unset($perimeterPoints[$y1][$x][$side]);
                                 }
 
-                                for ($y1 = $y - 1; $y1 >= 0; $y1--) {
-                                    if (!isset($perimeterPoints[$y1][$x][$side])) {
-                                        break;
-                                    }
+                                for ($y1 = $y - 1; isset($perimeterPoints[$y1][$x][$side]); $y1--) {
                                     unset($perimeterPoints[$y1][$x][$side]);
                                 }
                             }
@@ -227,12 +215,9 @@ class Day12 implements DayInterface
                 $visited[$point->y][$point->x] = $type;
                 unset($notVisited[$point->y][$point->x]);
 
-                foreach ($point->adjacent() as $adjacent) {
-                    if (
-                        ($grid[$adjacent->y][$adjacent->x] ?? '') === $type
-                        && !isset($visited[$adjacent->y][$adjacent->x])
-                    ) {
-                        $queue->push([new Point2D($adjacent->x, $adjacent->y), $type, $visited]);
+                foreach ($point->adjacent() as $p) {
+                    if (($grid[$p->y][$p->x] ?? '') === $type && !isset($visited[$p->y][$p->x])) {
+                        $queue->push([new Point2D($p->x, $p->y), $type, $visited]);
                     }
                 }
             }
