@@ -8,7 +8,6 @@ use App\Event\DayInterface;
 use App\Util\Point2D;
 use App\Util\StringUtil;
 use Ds\Queue;
-use Nette\Utils\Arrays;
 
 class Day12 implements DayInterface
 {
