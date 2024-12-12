@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Event\Year2024;
 
 use App\Event\DayInterface;
+use App\Util\Delta;
 use App\Util\Point2D;
 use App\Util\StringUtil;
 use Ds\Queue;
@@ -123,41 +124,22 @@ class Day12 implements DayInterface
 
         foreach ($regions as $region) {
             $area = $perimeter = 0;
-            $perimeterPoints = [];
 
             foreach ($region as $y => $xLine) {
                 foreach ($xLine as $x => $type) {
                     $area++;
                     $point = new Point2D($x, $y);
-                    $adj = ['N' => $point->north(), 'E' => $point->east(), 'S' => $point->south(), 'W' => $point->west()];
 
-                    foreach ($adj as $side => $adjacent) {
-                        if (!isset($region[$adjacent->y][$adjacent->x])) {
-                            $perimeterPoints[$point->y][$point->x][$side] = true;
-                        }
-                    }
-                }
-            }
+                    foreach (Delta::EDGE_CAPS as $deltaList) {
+                        $inside = count(array_filter($deltaList, fn($d) => isset($region[$point->y - $d[1]][$point->x - $d[0]])));
+                        $cornerInside = isset($region[$point->y - $deltaList[1][1]][$point->x - $deltaList[1][0]]);
 
-            while ([] !== array_filter($perimeterPoints)) {
-                foreach ($perimeterPoints as $y => $xLine) {
-                    foreach ($xLine as $x => $sides) {
-                        foreach (array_keys($sides) as $side) {
+                        if (
+                            0 === $inside // External corner (pointing outwards of the area)
+                            || (1 === $inside && $cornerInside) // Edge case - external corner pointing to external corner of the same area diagonally
+                            || (2 === $inside && !$cornerInside) // Internal corner (pointing inwards to the area)
+                        ) {
                             $perimeter++;
-                            unset($perimeterPoints[$y][$x][$side]);
-                            $dx = $side === 'N' || $side === 'S' ? 1 : 0;
-                            $dy = $dx === 0 ? 1 : 0;
-
-                            for ($x1 = $x + $dx, $y1 = $y + $dy; isset($perimeterPoints[$y1][$x1][$side]); $x1 += $dx, $y1 += $dy) {
-                                unset($perimeterPoints[$y1][$x1][$side]);
-                            }
-
-                            for ($x1 = $x - $dx, $y1 = $y - $dy; isset($perimeterPoints[$y1][$x1][$side]); $x1 -= $dx, $y1 -= $dy) {
-                                unset($perimeterPoints[$y1][$x1][$side]);
-                            }
-
-                            $perimeterPoints = array_map(array_filter(...), $perimeterPoints);
-                            continue 4;
                         }
                     }
                 }
