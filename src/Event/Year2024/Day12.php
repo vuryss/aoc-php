@@ -92,8 +92,7 @@ class Day12 implements DayInterface
 
     public function solvePart1(string $input): string|int
     {
-        $grid = StringUtil::inputToGridOfChars($input);
-        $regions = $this->collectRegions($grid);
+        $regions = $this->collectRegions($input);
         $sum = 0;
 
         foreach ($regions as $region) {
@@ -119,8 +118,7 @@ class Day12 implements DayInterface
 
     public function solvePart2(string $input): string|int
     {
-        $grid = StringUtil::inputToGridOfChars($input);
-        $regions = $this->collectRegions($grid);
+        $regions = $this->collectRegions($input);
         $sum = 0;
 
         foreach ($regions as $region) {
@@ -171,13 +169,13 @@ class Day12 implements DayInterface
         return $sum;
     }
 
-    private function collectRegions(array $grid): array
+    private function collectRegions(string $input): array
     {
+        $grid = StringUtil::inputToGridOfChars($input);
         $regions = [];
-        $notVisited = $grid;
 
-        while ([] !== array_filter($notVisited)) {
-            foreach ($notVisited as $y => $line) {
+        while ([] !== array_filter($grid)) {
+            foreach ($grid as $y => $line) {
                 foreach ($line as $x => $char) {
                     break 2;
                 }
@@ -195,7 +193,7 @@ class Day12 implements DayInterface
                 }
 
                 $visited[$point->y][$point->x] = $type;
-                unset($notVisited[$point->y][$point->x]);
+                unset($grid[$point->y][$point->x]);
 
                 foreach ($point->adjacent() as $p) {
                     if (($grid[$p->y][$p->x] ?? '') === $type && !isset($visited[$p->y][$p->x])) {
