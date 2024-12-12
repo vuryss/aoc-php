@@ -104,7 +104,7 @@ class Day12 implements DayInterface
                     $area++;
 
                     foreach (new Point2D($x, $y)->adjacent() as $adjacent) {
-                        if (($grid[$adjacent->y][$adjacent->x] ?? '') !== $type) {
+                        if (!isset($region[$adjacent->y][$adjacent->x])) {
                             $perimeter++;
                         }
                     }
@@ -134,7 +134,7 @@ class Day12 implements DayInterface
                     $adj = ['N' => $point->north(), 'E' => $point->east(), 'S' => $point->south(), 'W' => $point->west()];
 
                     foreach ($adj as $side => $adjacent) {
-                        if (($grid[$adjacent->y][$adjacent->x] ?? '') !== $type) {
+                        if (!isset($region[$adjacent->y][$adjacent->x])) {
                             $perimeterPoints[$point->y][$point->x][$side] = true;
                         }
                     }
