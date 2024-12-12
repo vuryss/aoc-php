@@ -141,41 +141,24 @@ class Day12 implements DayInterface
                 }
             }
 
-            while (!empty($perimeterPoints)) {
+            while ([] !== array_filter($perimeterPoints)) {
                 foreach ($perimeterPoints as $y => $xLine) {
-                    if (empty($perimeterPoints[$y])) {
-                        unset($perimeterPoints[$y]);
-                    }
-
                     foreach ($xLine as $x => $sides) {
-                        if (empty($perimeterPoints[$y][$x])) {
-                            unset($perimeterPoints[$y][$x]);
-                        }
-
                         foreach (array_keys($sides) as $side) {
                             $perimeter++;
                             unset($perimeterPoints[$y][$x][$side]);
+                            $dx = $side === 'N' || $side === 'S' ? 1 : 0;
+                            $dy = $dx === 0 ? 1 : 0;
 
-                            if ($side === 'N' || $side === 'S') {
-                                for ($x1 = $x + 1; isset($perimeterPoints[$y][$x1][$side]); $x1++) {
-                                    unset($perimeterPoints[$y][$x1][$side]);
-                                }
-
-                                for ($x1 = $x - 1; isset($perimeterPoints[$y][$x1][$side]); $x1--) {
-                                    unset($perimeterPoints[$y][$x1][$side]);
-                                }
+                            for ($x1 = $x + $dx, $y1 = $y + $dy; isset($perimeterPoints[$y1][$x1][$side]); $x1 += $dx, $y1 += $dy) {
+                                unset($perimeterPoints[$y1][$x1][$side]);
                             }
 
-                            if ($side === 'E' || $side === 'W') {
-                                for ($y1 = $y + 1; isset($perimeterPoints[$y1][$x][$side]); $y1++) {
-                                    unset($perimeterPoints[$y1][$x][$side]);
-                                }
-
-                                for ($y1 = $y - 1; isset($perimeterPoints[$y1][$x][$side]); $y1--) {
-                                    unset($perimeterPoints[$y1][$x][$side]);
-                                }
+                            for ($x1 = $x - $dx, $y1 = $y - $dy; isset($perimeterPoints[$y1][$x1][$side]); $x1 -= $dx, $y1 -= $dy) {
+                                unset($perimeterPoints[$y1][$x1][$side]);
                             }
 
+                            $perimeterPoints = array_map(array_filter(...), $perimeterPoints);
                             continue 4;
                         }
                     }
