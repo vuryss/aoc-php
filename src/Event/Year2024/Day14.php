@@ -58,14 +58,9 @@ class Day14 implements DayInterface
         $midY = (int) ($gridHeight / 2);
 
         foreach ($robots as $robot) {
-            if ($robot['x'] < $midX && $robot['y'] < $midY) {
-                $quadrants[0]++;
-            } elseif ($robot['x'] > $midX && $robot['y'] < $midY) {
-                $quadrants[1]++;
-            } elseif ($robot['x'] < $midX && $robot['y'] > $midY) {
-                $quadrants[2]++;
-            } elseif ($robot['x'] > $midX && $robot['y'] > $midY) {
-                $quadrants[3]++;
+            if ($robot['x'] !== $midX && $robot['y'] !== $midY) {
+                $quadrant = ($robot['x'] > $midX ? 1: 0) + ($robot['y'] > $midY ? 2: 0);
+                $quadrants[$quadrant]++;
             }
         }
 
