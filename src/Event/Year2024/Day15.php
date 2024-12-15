@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Event\Year2024;
 
 use App\Event\DayInterface;
+use App\Util\ArrowDirection;
 use App\Util\Point2D;
 use App\Util\StringUtil;
 use Ds\Queue;
@@ -82,7 +83,7 @@ class Day15 implements DayInterface
     {
         [$mapInput, $moves] = explode("\n\n", $input);
         $grid = StringUtil::inputToGridOfChars($mapInput);
-        $moves = str_split(str_replace("\n", '', $moves));
+        $moves = array_map(ArrowDirection::from(...), str_split(str_replace("\n", '', $moves)));
 
         foreach ($grid as $y => $xLine) {
             foreach ($xLine as $x => $char) {
@@ -93,33 +94,30 @@ class Day15 implements DayInterface
         }
 
         foreach ($moves as $move) {
-            $next = $this->nextPoint($robot, $move);
+            $next = $move->fromPoint($robot);
             $robotNext = $next;
-            $boxesToMove = [];
+            $nodesToMove = [['pos' => $robot, 'char' => '@']];
+            $newGrid = $grid;
 
             while ($grid[$next->y][$next->x] === 'O') {
-                $boxesToMove[] = $next;
-                $next = $this->nextPoint($next, $move);
+                $nodesToMove[] = ['pos' => $next, 'char' => 'O'];
+                $next = $move->fromPoint($next);
             }
 
             if ($grid[$next->y][$next->x] !== '.') {
                 continue;
             }
 
-            $newGrid = $grid;
-
-            foreach ($boxesToMove as $boxToMove) {
-                $newGrid[$boxToMove->y][$boxToMove->x] = '.';
+            foreach ($nodesToMove as $boxToMove) {
+                $newGrid[$boxToMove['pos']->y][$boxToMove['pos']->x] = '.';
             }
 
-            foreach ($boxesToMove as $boxToMove) {
-                $next = $this->nextPoint($boxToMove, $move);
-                $newGrid[$next->y][$next->x] = 'O';
+            foreach ($nodesToMove as $boxToMove) {
+                $next = $move->fromPoint($boxToMove['pos']);
+                $newGrid[$next->y][$next->x] = $boxToMove['char'];
             }
 
-            $newGrid[$robot->y][$robot->x] = '.';
             $robot = $robotNext;
-            $newGrid[$robot->y][$robot->x] = '@';
             $grid = $newGrid;
         }
 
@@ -129,7 +127,7 @@ class Day15 implements DayInterface
     public function solvePart2(string $input): string|int
     {
         [$mapInput, $moves] = explode("\n\n", $input);
-        $moves = str_split(str_replace("\n", '', $moves));
+        $moves = array_map(ArrowDirection::from(...), str_split(str_replace("\n", '', $moves)));
         $grid = [];
 
         foreach (explode("\n", $mapInput) as $y => $line) {
@@ -152,9 +150,10 @@ class Day15 implements DayInterface
         }
 
         foreach ($moves as $move) {
-            $next = $this->nextPoint($robot, $move);
+            $next = $move->fromPoint($robot);
             $robotNext = $next;
-            $boxesToMove = [];
+            $nodesToMove = [['pos' => $robot, 'char' => '@']];
+            $newGrid = $grid;
 
             if ($grid[$next->y][$next->x] === '#') {
                 continue;
@@ -175,14 +174,14 @@ class Day15 implements DayInterface
 
                 while (!$queue->isEmpty()) {
                     $box = $queue->pop();
-                    $boxesToMove[] = ['pos' => $box, 'char' => $grid[$box->y][$box->x]];
+                    $nodesToMove[] = ['pos' => $box, 'char' => $grid[$box->y][$box->x]];
 
                     if (isset($visited[$box->y][$box->x])) {
                         continue;
                     }
 
                     $visited[$box->y][$box->x] = true;
-                    $next = $this->nextPoint($box, $move);
+                    $next = $move->fromPoint($box);
                     $nextChar = $grid[$next->y][$next->x];
 
                     if ($nextChar === '[') {
@@ -197,37 +196,21 @@ class Day15 implements DayInterface
                 }
             }
 
-            $newGrid = $grid;
-
-            foreach ($boxesToMove as $boxToMove) {
+            foreach ($nodesToMove as $boxToMove) {
                 $pos = $boxToMove['pos'];
                 $newGrid[$pos->y][$pos->x] = '.';
             }
 
-            foreach ($boxesToMove as $boxToMove) {
-                $pos = $boxToMove['pos'];
-                $next = $this->nextPoint($pos, $move);
+            foreach ($nodesToMove as $boxToMove) {
+                $next = $move->fromPoint($boxToMove['pos']);
                 $newGrid[$next->y][$next->x] = $boxToMove['char'];
             }
 
-            $newGrid[$robot->y][$robot->x] = '.';
             $robot = $robotNext;
-            $newGrid[$robot->y][$robot->x] = '@';
-
             $grid = $newGrid;
         }
 
         return $this->sumPoints($grid);
-    }
-
-    public function nextPoint(Point2D $point, string $move): Point2D
-    {
-        return match ($move) {
-            '^' => $point->north(),
-            'v' => $point->south(),
-            '<' => $point->west(),
-            '>' => $point->east(),
-        };
     }
 
     public function sumPoints(array $grid): int
