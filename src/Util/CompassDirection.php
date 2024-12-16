@@ -30,4 +30,14 @@ enum CompassDirection: string
             self::WEST => self::NORTH,
         };
     }
+
+    public function movePoint(Point2D $point): Point2D
+    {
+        return match ($this) {
+            self::NORTH => $point->north(),
+            self::EAST => $point->east(),
+            self::SOUTH => $point->south(),
+            self::WEST => $point->west(),
+        };
+    }
 }
