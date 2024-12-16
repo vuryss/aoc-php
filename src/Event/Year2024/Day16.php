@@ -133,7 +133,7 @@ class Day16 implements DayInterface
             foreach ([$direction, $direction->turnLeft(), $direction->turnRight()] as $newDirection) {
                 $nextPoint = $newDirection->movePoint($position);
 
-                if ($grid[$nextPoint->y][$nextPoint->x] === '#' || isset($visited[$nextPoint->y][$nextPoint->x])) {
+                if ($grid[$nextPoint->y][$nextPoint->x] === '#') {
                     continue;
                 }
 
@@ -170,11 +170,8 @@ class Day16 implements DayInterface
             [$position, $direction, $score, $visited] = $queue->pop();
 
             if (
-                isset($visited[$position->y][$position->x])
-                || (
-                    isset($minStepsToNodeWithDirection[$position->y][$position->x][$direction->value])
-                    && $minStepsToNodeWithDirection[$position->y][$position->x][$direction->value] < $score
-                )
+                isset($minStepsToNodeWithDirection[$position->y][$position->x][$direction->value])
+                && $minStepsToNodeWithDirection[$position->y][$position->x][$direction->value] < $score
             ) {
                 continue;
             }
@@ -199,7 +196,7 @@ class Day16 implements DayInterface
             foreach ([$direction, $direction->turnLeft(), $direction->turnRight()] as $newDirection) {
                 $nextPoint = $newDirection->movePoint($position);
 
-                if ($grid[$nextPoint->y][$nextPoint->x] === '#' || isset($visited[$nextPoint->y][$nextPoint->x])) {
+                if ($grid[$nextPoint->y][$nextPoint->x] === '#') {
                     continue;
                 }
 
