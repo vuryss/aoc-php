@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Event\Year2024;
 
 use App\Event\DayInterface;
+use App\Util\StringUtil;
 
 class Day17 implements DayInterface
 {
@@ -32,56 +33,49 @@ class Day17 implements DayInterface
 
     public function solvePart1(string $input): string|int
     {
-        [$registers, $program] = $this->parseInput($input);
+        [$a, $program] = $this->parseInput($input);
 
-        return implode(',', $this->execute($registers, $program));
+        return $this->execute($a, $program);
     }
 
     public function solvePart2(string $input): string|int
     {
-        [$registers, $program] = $this->parseInput($input);
-        $search = implode('', $program);
+        [, $program] = $this->parseInput($input);
+        $search = implode(',', $program);
         $a = 0;
         $matchedLength = 1;
 
         while (true) {
-            $registers['A'] = $a;
-            $output = implode('', $this->execute($registers, $program));
+            $output = $this->execute($a, $program);
 
             if (substr($search, -$matchedLength) === $output) {
                 if ($search === $output) {
-                    break;
+                    return $a;
                 }
 
                 $a <<= 3;
-                $matchedLength++;
+                $matchedLength += 2;
 
                 continue;
             }
 
             $a++;
         }
-
-        return $a;
     }
 
     private function parseInput(string $input): array
     {
         $blocks = explode("\n\n", $input);
-        $registers = [];
         $blocks[1] = str_replace('Program: ', '', $blocks[1]);
         $program = array_map('intval', explode(',', $blocks[1]));
+        $a = StringUtil::extractIntegers(explode("\n", $blocks[0])[0])[0];
 
-        foreach (explode("\n", $blocks[0]) as $line) {
-            preg_match('/Register ([A-Z]): (\d+)/', $line, $matches);
-            $registers[$matches[1]] = (int)$matches[2];
-        }
-
-        return [$registers, $program];
+        return [$a, $program];
     }
 
-    private function execute(array $registers, array $program): array
+    private function execute(int $a, array $program): string
     {
+        $registers = ['A' => $a, 'B' => 0, 'C' => 0];
         $output = [];
         $pointer = 0;
 
@@ -109,6 +103,6 @@ class Day17 implements DayInterface
             $pointer += 2;
         }
 
-        return $output;
+        return implode(',', $output);
     }
 }
