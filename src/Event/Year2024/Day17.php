@@ -40,22 +40,21 @@ class Day17 implements DayInterface
     public function solvePart2(string $input): string|int
     {
         [$registers, $program] = $this->parseInput($input);
-        $search = array_reverse($program);
+        $search = implode('', $program);
         $a = 0;
-        $lastRemoved = null;
+        $matchedLength = 1;
 
         while (true) {
             $registers['A'] = $a;
-            $output = $this->execute($registers, $program);
+            $output = implode('', $this->execute($registers, $program));
 
-            if ($output[0] === $search[0] && ($lastRemoved === null || $lastRemoved === $output[1])) {
-                $lastRemoved = array_shift($search);
-
-                if ([]  === $search) {
+            if (substr($search, -$matchedLength) === $output) {
+                if ($search === $output) {
                     break;
                 }
 
                 $a <<= 3;
+                $matchedLength++;
 
                 continue;
             }
