@@ -96,42 +96,16 @@ class Day17 implements DayInterface
                 $comboOperand === 6 => $registers['C'],
             };
 
-            switch ($instruction) {
-                case 0:
-                    $registers['A'] = intdiv($registers['A'], 2 ** $value);
-                    break;
-
-                case 1:
-                    $registers['B'] ^= $comboOperand;
-                    break;
-
-                case 2:
-                    $registers['B'] = $value % 8;
-                    break;
-
-                case 3:
-                    if ($registers['A'] !== 0) {
-                        $pointer = $comboOperand;
-                        continue 2;
-                    }
-                    break;
-
-                case 4:
-                    $registers['B'] ^= $registers['C'];
-                    break;
-
-                case 5:
-                    $output[] = $value % 8;
-                    break;
-
-                case 6:
-                    $registers['B'] = intdiv($registers['A'], 2 ** $value);
-                    break;
-
-                case 7:
-                    $registers['C'] = intdiv($registers['A'], 2 ** $value);
-                    break;
-            }
+            match ($instruction) {
+                0 => $registers['A'] = intdiv($registers['A'], 2 ** $value),
+                1 => $registers['B'] ^= $comboOperand,
+                2 => $registers['B'] = $value % 8,
+                3 => $pointer = $registers['A'] !== 0 ? $comboOperand - 2 : $pointer,
+                4 => $registers['B'] ^= $registers['C'],
+                5 => $output[] = $value % 8,
+                6 => $registers['B'] = intdiv($registers['A'], 2 ** $value),
+                7 => $registers['C'] = intdiv($registers['A'], 2 ** $value),
+            };
 
             $pointer += 2;
         }
