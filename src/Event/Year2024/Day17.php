@@ -32,32 +32,14 @@ class Day17 implements DayInterface
 
     public function solvePart1(string $input): string|int
     {
-        $blocks = explode("\n\n", $input);
-        $registers = [];
-
-        foreach (explode("\n", $blocks[0]) as $line) {
-            preg_match('/Register ([A-Z]): (\d+)/', $line, $matches);
-            $registers[$matches[1]] = (int)$matches[2];
-        }
-
-        $blocks[1] = str_replace('Program: ', '', $blocks[1]);
-        $program = array_map('intval', explode(',', $blocks[1]));
+        [$registers, $program] = $this->parseInput($input);
 
         return implode(',', $this->execute($registers, $program));
     }
 
     public function solvePart2(string $input): string|int
     {
-        $blocks = explode("\n\n", $input);
-        $registers = [];
-        $blocks[1] = str_replace('Program: ', '', $blocks[1]);
-        $program = array_map('intval', explode(',', $blocks[1]));
-
-        foreach (explode("\n", $blocks[0]) as $line) {
-            preg_match('/Register ([A-Z]): (\d+)/', $line, $matches);
-            $registers[$matches[1]] = (int)$matches[2];
-        }
-
+        [$registers, $program] = $this->parseInput($input);
         $search = array_reverse($program);
         $a = 0;
         $lastRemoved = null;
@@ -82,6 +64,21 @@ class Day17 implements DayInterface
         }
 
         return $a;
+    }
+
+    private function parseInput(string $input): array
+    {
+        $blocks = explode("\n\n", $input);
+        $registers = [];
+        $blocks[1] = str_replace('Program: ', '', $blocks[1]);
+        $program = array_map('intval', explode(',', $blocks[1]));
+
+        foreach (explode("\n", $blocks[0]) as $line) {
+            preg_match('/Register ([A-Z]): (\d+)/', $line, $matches);
+            $registers[$matches[1]] = (int)$matches[2];
+        }
+
+        return [$registers, $program];
     }
 
     private function execute(array $registers, array $program): array
