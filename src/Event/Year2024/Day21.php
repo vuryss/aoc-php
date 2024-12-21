@@ -42,15 +42,12 @@ class Day21 implements DayInterface
 
     public function solvePart1(string $input): string|int
     {
-        $codes = explode("\n", $input);
         $this->numericPadPaths = $this->calculateKeyPadPaths(self::NUMERIC_PAD);
         $this->directionalPadPaths = $this->calculateKeyPadPaths(self::DIRECTIONAL_PAD);
         $sum = 0;
 
-        foreach ($codes as $code) {
-            $count = $this->getMinMovements($code, 2);
-
-            $sum += $count * StringUtil::extractIntegers($code)[0];
+        foreach (explode("\n", $input) as $code) {
+            $sum += $this->getMinMovements($code, 2) * StringUtil::extractIntegers($code)[0];
         }
 
         return $sum;
@@ -58,15 +55,12 @@ class Day21 implements DayInterface
 
     public function solvePart2(string $input): string|int
     {
-        $codes = explode("\n", $input);
         $this->numericPadPaths = $this->calculateKeyPadPaths(self::NUMERIC_PAD);
         $this->directionalPadPaths = $this->calculateKeyPadPaths(self::DIRECTIONAL_PAD);
         $sum = 0;
 
-        foreach ($codes as $code) {
-            $count = $this->getMinMovements($code, 25);
-
-            $sum += $count * StringUtil::extractIntegers($code)[0];
+        foreach (explode("\n", $input) as $code) {
+            $sum += $this->getMinMovements($code, 25) * StringUtil::extractIntegers($code)[0];
         }
 
         return $sum;
@@ -79,20 +73,20 @@ class Day21 implements DayInterface
 
         foreach (str_split($characters) as $character) {
             $paths = $this->numericPadPaths[$previous][$character];
-            $a = [];
+            $movements = [];
 
             foreach ($paths as $path) {
-                $a[] = $this->getMinMovements2($path, $numberOfRobots);
+                $movements[] = $this->getMinDirectionalPadMovements($path, $numberOfRobots);
             }
 
             $previous = $character;
-            $count += min($a);
+            $count += min($movements);
         }
 
         return $count;
     }
 
-    private function getMinMovements2(string $characters, int $numberOfRobots = 2): int
+    private function getMinDirectionalPadMovements(string $characters, int $numberOfRobots = 2): int
     {
         if (isset($this->cache[$characters][$numberOfRobots])) {
             return $this->cache[$characters][$numberOfRobots];
@@ -107,19 +101,23 @@ class Day21 implements DayInterface
 
         foreach (str_split($characters) as $character) {
             $paths = $this->directionalPadPaths[$previous][$character];
-            $a = [];
+            $movements = [];
 
             foreach ($paths as $path) {
-                $a[] = $this->getMinMovements2($path, $numberOfRobots - 1);
+                $movements[] = $this->getMinDirectionalPadMovements($path, $numberOfRobots - 1);
             }
 
             $previous = $character;
-            $count += min($a);
+            $count += min($movements);
         }
 
         return $this->cache[$characters][$numberOfRobots] = $count;
     }
 
+    /**
+     * @param array<int, array<int, string|null>> $keyPad
+     * @return array<string, array<string, array<string>>>
+     */
     private function calculateKeyPadPaths(array $keyPad): array
     {
         $paths = [];
@@ -146,30 +144,21 @@ class Day21 implements DayInterface
                     }
 
                     $queue = new Queue();
-                    $queue->push([new Point2D($x, $y), [], []]);
+                    $queue->push([new Point2D($x, $y), '', []]);
                     $minLength = null;
 
                     while (!$queue->isEmpty()) {
                         /** @var Point2D $position */
                         [$position, $movements, $visited] = $queue->pop();
-
-                        if (isset($visited[$position->y][$position->x])) {
-                            continue;
-                        }
-
                         $visited[$position->y][$position->x] = true;
 
-                        if (null !== $minLength && count($movements) > $minLength) {
+                        if (null !== $minLength && strlen($movements) > $minLength) {
                             break;
                         }
 
                         if ($keyPad[$position->y][$position->x] === $target) {
-                            if ($minLength === null) {
-                                $minLength = count($movements);
-                            }
-
-                            $movements[] = 'A';
-                            $paths[$char][$target][] = implode('', $movements);
+                            $minLength ??= strlen($movements);
+                            $paths[$char][$target][] = $movements . 'A';
                             continue;
                         }
 
@@ -181,15 +170,8 @@ class Day21 implements DayInterface
                         ];
 
                         foreach ($adjacent as $move => $next) {
-                            if (
-                                $next->x >= 0 && $next->y >= 0
-                                && $next->x < count($keyPad[0]) && $next->y < count($keyPad)
-                                && $keyPad[$next->y][$next->x] !== null
-                                && !isset($visited[$next->y][$next->x])
-                            ) {
-                                $newMovements = $movements;
-                                $newMovements[] = $move;
-                                $queue->push([$next, $newMovements, $visited]);
+                            if (isset($keyPad[$next->y][$next->x]) && !isset($visited[$next->y][$next->x])) {
+                                $queue->push([$next, $movements . $move, $visited]);
                             }
                         }
                     }
