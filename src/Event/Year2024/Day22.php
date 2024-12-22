@@ -72,9 +72,9 @@ class Day22 implements DayInterface
 
     private function generateSecretNumber(int $number): int
     {
-        $number = (($number * 64) ^ $number) & 16777215;
-        $number = (intdiv($number, 32) ^ $number) & 16777215;
+        $number = ($number << 6 ^ $number) & 16777215;
+        $number = ($number >> 5 ^ $number) & 16777215;
 
-        return (($number * 2048) ^ $number) & 16777215;
+        return ($number << 11 ^ $number) & 16777215;
     }
 }
