@@ -53,17 +53,15 @@ readonly class Algorithms
         $pivot = [] === $nodes ? reset($excluded) : reset($nodes);
 
         foreach (array_diff($nodes, $connections[$pivot]) as $node) {
-            $newClique = array_merge($clique, [$node]);
-            $nodeNeighbours = $connections[$node];
-            $newNodes = array_intersect($nodes, $nodeNeighbours);
-            $newExcluded = array_intersect($excluded, $nodeNeighbours);
-
-            foreach (self::bronKerbosch($connections, $newClique, $newNodes, $newExcluded) as $maxClique) {
-                yield $maxClique;
-            }
+            yield from self::bronKerbosch(
+                $connections,
+                [...$clique, $node],
+                array_intersect($nodes, $connections[$node]),
+                array_intersect($excluded, $connections[$node])
+            );
 
             $nodes = array_diff($nodes, [$node]);
-            $excluded = array_merge($excluded, [$node]);
+            $excluded[] = $node;
         }
     }
 }
