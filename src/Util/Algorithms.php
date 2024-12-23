@@ -45,7 +45,9 @@ readonly class Algorithms
             return;
         }
 
-        foreach ($P as $vertex) {
+        $u = [] === $P ? reset($X) : reset($P);
+
+        foreach (array_diff($P, $connections[$u]) as $vertex) {
             $R2 = array_merge($R, [$vertex]);
             $neighbors = $connections[$vertex];
             $P2 = array_intersect($P, $neighbors);
