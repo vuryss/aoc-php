@@ -26,6 +26,7 @@ readonly class Algorithms
 
     public static function maxCliqueBronKerbosch(array $connections): array
     {
+        uasort($connections, fn ($a, $b) => count($b) <=> count($a));
         $P = array_keys($connections);
         $maxClique = [];
 
@@ -38,27 +39,31 @@ readonly class Algorithms
         return $maxClique;
     }
 
-    private static function bronKerbosch(array $connections, array $R = [], array $P = [], array $X = []): iterable
-    {
-        if ([] === $P && [] === $X) {
-            yield $R;
+    private static function bronKerbosch(
+        array $connections,
+        array $clique = [],
+        array $nodes = [],
+        array $excluded = []
+    ): iterable {
+        if ([] === $nodes && [] === $excluded) {
+            yield $clique;
             return;
         }
 
-        $u = [] === $P ? reset($X) : reset($P);
+        $pivot = [] === $nodes ? reset($excluded) : reset($nodes);
 
-        foreach (array_diff($P, $connections[$u]) as $vertex) {
-            $R2 = array_merge($R, [$vertex]);
-            $neighbors = $connections[$vertex];
-            $P2 = array_intersect($P, $neighbors);
-            $X2 = array_intersect($X, $neighbors);
+        foreach (array_diff($nodes, $connections[$pivot]) as $node) {
+            $newClique = array_merge($clique, [$node]);
+            $nodeNeighbours = $connections[$node];
+            $newNodes = array_intersect($nodes, $nodeNeighbours);
+            $newExcluded = array_intersect($excluded, $nodeNeighbours);
 
-            foreach (self::bronKerbosch($connections, $R2, $P2, $X2) as $clique) {
-                yield $clique;
+            foreach (self::bronKerbosch($connections, $newClique, $newNodes, $newExcluded) as $maxClique) {
+                yield $maxClique;
             }
 
-            $P = array_diff($P, [$vertex]);
-            $X = array_merge($X, [$vertex]);
+            $nodes = array_diff($nodes, [$node]);
+            $excluded = array_merge($excluded, [$node]);
         }
     }
 }
