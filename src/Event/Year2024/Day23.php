@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace App\Event\Year2024;
 
 use App\Event\DayInterface;
-use App\Util\Algorithms;
-use Ds\Stack;
 
 class Day23 implements DayInterface
 {
