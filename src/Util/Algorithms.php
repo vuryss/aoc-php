@@ -23,4 +23,40 @@ readonly class Algorithms
 
         return (int) $area;
     }
+
+    public static function maxCliqueBronKerbosch(array $connections): array
+    {
+        $P = array_keys($connections);
+        $maxClique = [];
+
+        foreach (self::bronKerbosch($connections, [], $P, []) as $clique) {
+            if (count($clique) > count($maxClique)) {
+                $maxClique = $clique;
+            }
+        }
+
+        return $maxClique;
+    }
+
+    private static function bronKerbosch(array $connections, array $R = [], array $P = [], array $X = []): iterable
+    {
+        if ([] === $P && [] === $X) {
+            yield $R;
+            return;
+        }
+
+        foreach ($P as $vertex) {
+            $R2 = array_merge($R, [$vertex]);
+            $neighbors = $connections[$vertex];
+            $P2 = array_intersect($P, $neighbors);
+            $X2 = array_intersect($X, $neighbors);
+
+            foreach (self::bronKerbosch($connections, $R2, $P2, $X2) as $clique) {
+                yield $clique;
+            }
+
+            $P = array_diff($P, [$vertex]);
+            $X = array_merge($X, [$vertex]);
+        }
+    }
 }
