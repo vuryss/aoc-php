@@ -6,6 +6,7 @@ namespace App\Event\Year2024;
 
 use App\Event\DayInterface;
 use App\Util\Algorithms;
+use Ds\Stack;
 
 class Day23 implements DayInterface
 {
@@ -128,7 +129,31 @@ class Day23 implements DayInterface
             $connections[$b][] = $a;
         }
 
-        $maxClique = Algorithms::maxCliqueBronKerbosch($connections);
+        // General algorithm for finding the maximum clique in a graph
+        // $maxClique = Algorithms::maxCliqueBronKerbosch($connections);
+
+        // In our specific case this is faster
+        $maxClique = [];
+        $computers = array_keys($connections);
+
+        foreach ($computers as $computer) {
+            $clique = [$computer];
+
+            foreach ($connections[$computer] as $possibleNext) {
+                foreach ($clique as $cliqueComputer) {
+                    if (!in_array($possibleNext, $connections[$cliqueComputer], true)) {
+                        continue 2;
+                    }
+                }
+
+                $clique[] = $possibleNext;
+            }
+
+            if (count($clique) > count($maxClique)) {
+                $maxClique = $clique;
+            }
+        }
+
         sort($maxClique);
 
         return implode(',', $maxClique);
