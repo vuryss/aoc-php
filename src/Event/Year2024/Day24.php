@@ -105,8 +105,8 @@ class Day24 implements DayInterface
     public function solvePart2(string $input): string|int
     {
         $blocks = explode("\n\n", $input);
-
         $connections = [];
+        $swapped = [];
 
         foreach (explode("\n", $blocks[1]) as $line) {
             [$inputs, $output] = explode(' -> ', $line);
@@ -114,14 +114,11 @@ class Day24 implements DayInterface
         }
 
         // First part:
-        // Check on which z the calculation is wrong
-        // For that z check if there is any XOR that has been switched to '1', which makes it the correct XOR for that z
-        // Swap those outputs
-        $xorSwapped = true;
-        $swapped = [];
-
-        while ($xorSwapped) {
-            $xorSwapped = false;
+        // Observation: each z wire should be a result of an XOR operation, 3 of them are not, on those the calculations
+        // are wrong.
+        // So check on which z the calculation is wrong, for that z check if there is any XOR that has been switched
+        // to '1', which makes it the correct XOR for that z, instead of the assigned one. Swap them.
+        while (true) {
             $xorWires = array_filter(array_keys($connections), fn ($output) => $connections[$output][1] === 'XOR');
 
             for ($i = 1; $i < 45; $i++) {
@@ -147,13 +144,14 @@ class Day24 implements DayInterface
                             $connections[$zWire] = $connections[$wire];
                             $connections[$wire] = $temp[$zWire];
                             $swapped = [...$swapped, $wire, $zWire];
-                            $xorSwapped = true;
 
                             continue 3;
                         }
                     }
                 }
             }
+
+            break;
         }
 
         // Second part:
@@ -167,25 +165,18 @@ class Day24 implements DayInterface
             $bit = substr($output, 1);
             $input1 = $connections[$input[0]];
             $input2 = $connections[$input[2]];
+            $regex = '/[xy]' . $bit . ' XOR [xy]' . $bit . '/';
 
-            if (
-                $input1 === ['x' . $bit, 'XOR', 'y' . $bit] ||
-                $input1 === ['y' . $bit, 'XOR', 'x' . $bit] ||
-                $input2 === ['x' . $bit, 'XOR', 'y' . $bit] ||
-                $input2 === ['y' . $bit, 'XOR', 'x' . $bit]
-            ) {
+            if (preg_match($regex, implode(' ', $input1)) || preg_match($regex, implode(' ', $input2))) {
                 continue;
             }
 
             // Check which of the 2 inputs referenced x and y directly
             $wrongInput = $input1[0][0] === 'x' || $input1[0][0] === 'y' ? $input[0] : $input[2];
 
-            // Find the XOR of the same bit
-            $match1 = ['x' . $bit, 'XOR', 'y' . $bit];
-            $match2 = ['y' . $bit, 'XOR', 'x' . $bit];
-
+            // Find the XOR of the same bit that is correct, swap it with the wrong input
             foreach ($connections as $o => $i) {
-                if ($i === $match1 || $i === $match2) {
+                if (preg_match($regex, implode(' ', $i))) {
                     $temp = $connections;
                     $connections[$o] = $connections[$wrongInput];
                     $connections[$wrongInput] = $temp[$o];
