@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Event\Year2024;
 
 use App\Event\DayInterface;
+use App\Event\Year2024\Day24\Circuit;
 
 class Day24 implements DayInterface
 {
@@ -96,7 +97,9 @@ class Day24 implements DayInterface
             $connections[$output] = explode(' ', $inputs);
         }
 
-        return $this->calculate($wires, $connections)[0];
+        $circuit = new Circuit(connections: $connections, wires: $wires);
+
+        return $circuit->getOutput();
     }
 
     public function solvePart2(string $input): string|int
@@ -119,54 +122,34 @@ class Day24 implements DayInterface
 
         while ($xorSwapped) {
             $xorSwapped = false;
-            $xors = [];
-
-            foreach ($connections as $output => $inputs) {
-                if ($inputs[1] !== 'XOR') {
-                    continue;
-                }
-
-                $xors[$output] = 0;
-            }
+            $xorWires = array_filter(array_keys($connections), fn ($output) => $connections[$output][1] === 'XOR');
 
             for ($i = 1; $i < 45; $i++) {
                 $wires = [];
-                $num = str_repeat('1', $i);
-                $expectedResult = (int)base_convert($num, 2, 10) + (int)base_convert($num, 2, 10);
+                $expectedResult = (2 ** $i - 1) * 2;
 
                 for ($j = 0; $j < 45; $j++) {
-                    $wires['x' . str_pad("$j", 2, '0', STR_PAD_LEFT)] = isset($num[$j]) ? 1 : 0;
-                    $wires['y' . str_pad("$j", 2, '0', STR_PAD_LEFT)] = isset($num[$j]) ? 1 : 0;
+                    $bit = str_pad("$j", 2, '0', STR_PAD_LEFT);
+                    $wires['x' . $bit] = $j < $i ? 1 : 0;
+                    $wires['y' . $bit] = $j < $i ? 1 : 0;
                 }
 
-                [$result, $wires] = $this->calculate($wires, $connections);
+                $circuit = new Circuit(connections: $connections, wires: $wires);
 
-                if ($result !== $expectedResult) {
-                    $currentXors = $xors;
-
-                    foreach ($wires as $wire => $value) {
-                        if (isset($xors[$wire]) && $value === 1) {
-                            $xors[$wire]++;
-                        }
-                    }
-
+                if ($circuit->getOutput() !== $expectedResult) {
                     $zWire = 'z' . str_pad("$i", 2, '0', STR_PAD_LEFT);
 
-                    foreach ($currentXors as $output => $value) {
-                        if ($output[0] !== 'z' && $value !== $xors[$output]) {
+                    foreach ($xorWires as $wire) {
+                        $signal = $circuit->getWireSignal($wire);
+
+                        if ($wire[0] !== 'z' && $signal === 1) {
                             $temp = $connections;
-                            $connections[$zWire] = $connections[$output];
-                            $connections[$output] = $temp[$zWire];
-                            $swapped = [...$swapped, $output, $zWire];
+                            $connections[$zWire] = $connections[$wire];
+                            $connections[$wire] = $temp[$zWire];
+                            $swapped = [...$swapped, $wire, $zWire];
                             $xorSwapped = true;
 
                             continue 3;
-                        }
-                    }
-                } else {
-                    foreach ($wires as $wire => $value) {
-                        if (isset($xors[$wire]) && $value === 1) {
-                            $xors[$wire]++;
                         }
                     }
                 }
@@ -175,6 +158,7 @@ class Day24 implements DayInterface
 
         // Second part:
         // Each z wire (except first and last) should have one of the inputs be (x xor y) of the same bit
+        // If not, find the correct (x xor y) and swap it with the wrong input (which references x or y directly)
         foreach ($connections as $output => $input) {
             if ($output[0] !== 'z' || $output === 'z00' || $output === 'z45') {
                 continue;
@@ -213,42 +197,5 @@ class Day24 implements DayInterface
         sort($swapped);
 
         return implode(',', $swapped);
-    }
-
-    private function calculate(array $wires, array $connections): array
-    {
-        $changed = true;
-
-        while (!empty($connections) && $changed) {
-            $changed = false;
-
-            foreach ($connections as $output => $inputs) {
-                if (isset($wires[$inputs[0]]) && isset($wires[$inputs[2]])) {
-                    $changed = true;
-                    $a = (int) $wires[$inputs[0]];
-                    $b = (int) $wires[$inputs[2]];
-
-                    $wires[$output] = match ($inputs[1]) {
-                        'AND' => $a & $b,
-                        'OR' => $a | $b,
-                        'XOR' => $a ^ $b,
-                    };
-
-                    unset($connections[$output]);
-                }
-            }
-        }
-
-        krsort($wires);
-
-        $number = '';
-
-        foreach ($wires as $wire => $value) {
-            if (str_starts_with($wire, 'z')) {
-                $number .= $value;
-            }
-        }
-
-        return [(int) base_convert($number, 2, 10), $wires];
     }
 }
